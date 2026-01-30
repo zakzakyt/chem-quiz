@@ -70,4 +70,4 @@ const compounds = [
     { id: 64, name: "トリニトロトルエン", formula: "C7H5N3O6", image: "tnt.png", C: 7, H: 5, O: 6, N: 3, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 1, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 3, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 0, reaction_bromine: 0, reaction_dehydrate: 0 }
 ];
 
-module.exports = { compounds };
+module.exports = compounds;
