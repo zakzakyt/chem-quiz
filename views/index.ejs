@@ -3,27 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    
+    <title>有機化学構造決定クイズ - 64種類の化合物を特定せよ！</title>
+    <meta name="description" content="大学入試・プロレベルの有機化合物を特定するアキネーター風クイズ。全64種類のデータセットから、いかに少ない質問で構造を決定できるか挑戦しましょう。">
+    <meta name="keywords" content="有機化学, 構造決定, 化学, クイズ, 大学入試, 共通テスト, 学習アプリ, 九工大">
+    
     <meta name="google-site-verification" content="sgJmgQeuXZ41wG74J3_lR81T8bAys4hFCBpR_S4-K2M" />
 
-    <title>有機化学構造決定クイズ - 31種類の化合物を特定せよ！</title>
-    <meta name="description" content="大学入試レベルの有機化合物を特定するアキネーター風クイズ。銀鏡反応や不斉炭素などの性質から、いかに少ない質問で構造を決定できるか挑戦しましょう。">
-    <meta name="keywords" content="有機化学, 構造決定, 化学, クイズ, 大学入試, 共通テスト, 学習アプリ">
-    <meta name="author" content="Your Name">
-
     <meta property="og:title" content="有機化学構造決定クイズ">
-    <meta property="og:description" content="君は少ない質問で化合物を特定できるか？全31種類の有機化合物に対応！">
+    <meta property="og:description" content="君は最短6手で全64種類の化合物を特定できるか？">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://chem-quiz.onrender.com"> <meta property="og:image" content="https://chem-quiz.onrender.com/images/benzene.png"> <meta name="twitter:card" content="summary_large_image">
+    <meta property="og:url" content="https://chem-quiz.onrender.com">
+    <meta property="og:image" content="https://chem-quiz.onrender.com/images/benzene.png">
+    <meta name="twitter:card" content="summary_large_image">
 
     <style>
         :root {
             --primary-color: #4a90e2;
             --bg-color: #f4f7f6;
             --text-color: #333;
+            --success-color: #27ae60;
+            --warning-color: #e67e22;
         }
         body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
             padding: 20px;
@@ -32,6 +35,7 @@
         }
         .container { max-width: 600px; width: 100%; display: flex; flex-direction: column; gap: 20px; }
         
+        .header-info { text-align: center; margin-bottom: 10px; }
         .turn-badge {
             background: #2c3e50;
             color: white;
@@ -39,7 +43,6 @@
             border-radius: 20px;
             font-weight: bold;
             display: inline-block;
-            margin-bottom: 10px;
         }
 
         .card {
@@ -62,40 +65,37 @@
         button:hover { opacity: 0.9; }
         
         .btn-ask { background-color: var(--primary-color); }
-        .btn-guess { background-color: #e67e22; }
+        .btn-guess { background-color: var(--warning-color); }
         .btn-giveup { background-color: #95a5a6; margin-top: 10px; font-size: 0.9rem; }
-        
-        /* スタートボタン（統合版） */
-        .btn-start { background-color: #27ae60; font-size: 1.2rem; padding: 15px; margin-top: 10px; }
+        .btn-start { background-color: var(--success-color); font-size: 1.2rem; padding: 15px; }
 
         .hidden { display: none !important; }
 
+        /* モーダル/オーバーレイ */
         #overlay-screen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.85);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
+            display: flex; justify-content: center; align-items: center; z-index: 1000;
         }
         .modal-box {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            text-align: center;
-            max-width: 90%;
-            width: 450px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            background: white; padding: 30px; border-radius: 15px; text-align: center;
+            max-width: 90%; width: 450px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
 
-        .rank-text { font-size: 2.5rem; color: #e67e22; margin: 10px 0; font-weight: bold; }
+        .rank-text { font-size: 2.5rem; color: var(--warning-color); margin: 10px 0; font-weight: bold; }
         
         #logs { display: flex; flex-direction: column; gap: 10px; padding-bottom: 50px; }
         .log-item { padding: 12px; border-radius: 8px; background: white; border-left: 5px solid #ccc; display: flex; justify-content: space-between; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
-        .log-item.yes { border-left-color: #27ae60; background: #eafaf1; }
+        .log-item.yes { border-left-color: var(--success-color); background: #eafaf1; }
         .log-item.no { border-left-color: #e74c3c; background: #fdedec; }
         .log-item.giveup { border-left-color: #95a5a6; background: #f4f4f4; color: #7f8c8d; }
+
+        /* シェアボタン */
+        .btn-x-share {
+            background-color: #000; color: #fff; display: flex; align-items: center;
+            justify-content: center; gap: 8px; margin: 15px 0;
+        }
     </style>
 </head>
 <body>
@@ -103,37 +103,35 @@
 <div id="overlay-screen">
     <div id="start-content" class="modal-box">
         <h1>🧪 Organic Quiz</h1>
-        <p>全31種類の有機化合物から<br>正解を特定してください</p>
-        <button class="btn-start" onclick="startGame()">
-            🚀 ゲームスタート
-        </button>
+        <p>全64種類の有機化合物から<br>正解を特定してください</p>
+        <button class="btn-start" onclick="startGame()">🚀 ゲームスタート</button>
     </div>
 
     <div id="result-content" class="modal-box" style="display:none;">
-        <h2 id="result-title" style="margin:0; color:#27ae60;">🎉 CONGRATULATIONS!</h2>
+        <h2 id="result-title">🎉 CONGRATULATIONS!</h2>
         <p>正解は <b id="result-name" style="font-size:1.4em;"></b> でした。</p>
-        <p id="result-formula" style="font-size: 1.5em; font-family: 'Times New Roman', serif; margin: 5px 0; color: #555; letter-spacing: 1px;"></p>
+        <p id="result-formula" style="font-size: 1.5em; font-family: serif; color: #555;"></p>
         
-        <div style="margin: 15px 0; min-height: 100px; display: flex; justify-content: center; align-items: center;">
-            <img id="result-image" src="" alt="構造式" style="display:none; max-width: 100%; height: auto; max-height: 200px; border: 1px solid #ddd; border-radius: 8px; padding: 5px;">
+        <div style="margin: 15px 0;">
+            <img id="result-image" src="" alt="構造式" style="display:none; max-width: 100%; max-height: 200px; border: 1px solid #ddd; border-radius: 8px; padding: 5px;">
         </div>
 
         <div class="rank-text" id="result-rank"></div>
         <p>記録: <b id="result-turns"></b> ターン</p>
-        <hr style="border:0; border-top:1px solid #eee; margin:20px 0;">
-        
-        <button class="btn-start" style="margin:0;" onclick="startGame()">
-            🔄 もう一度遊ぶ
+
+        <button id="share-button" class="btn-x-share">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.045 4.126H5.078z"></path></svg>
+            結果をXでシェアする
         </button>
+        
+        <button class="btn-start" style="margin:0;" onclick="startGame()">🔄 もう一度遊ぶ</button>
     </div>
 </div>
 
 <div class="container">
-    <header style="text-align: center;">
+    <header class="header-info">
         <h1>🧪 Organic Chem Quiz</h1>
-        <div class="turn-badge">
-            現在: <span id="turn-display">0</span> ターン目
-        </div>
+        <div class="turn-badge">現在: <span id="turn-display">0</span> ターン目</div>
     </header>
 
     <div class="card">
@@ -145,12 +143,14 @@
                     <option value="H">水素原子 (H)</option>
                     <option value="O">酸素原子 (O)</option>
                     <option value="N">窒素原子 (N)</option>
+                    <option value="S">硫黄原子 (S)</option>
+                    <option value="Cl">塩素原子 (Cl)</option>
                 </optgroup>
                 <optgroup label="結合・構造">
                     <option value="double_bond">炭素間二重結合 (C=C)</option>
                     <option value="triple_bond">三重結合 (C≡C)</option>
                     <option value="ring_benzene">ベンゼン環</option>
-                    <option value="is_chiral" data-type="bool">不斉炭素原子 (※光学異性体)</option>
+                    <option value="is_chiral" data-type="bool">不斉炭素原子</option>
                 </optgroup>
                 <optgroup label="官能基">
                     <option value="group_oh">ヒドロキシ基 (-OH)</option>
@@ -160,15 +160,18 @@
                     <option value="group_ether">エーテル結合 (-O-)</option>
                     <option value="group_ester">エステル結合 (-COO-)</option>
                     <option value="group_nh2">アミノ基 (-NH₂)</option>
+                    <option value="group_so3h">スルホン酸基 (-SO₃H)</option>
+                    <option value="group_amide">アミド基 (-NHCO-)</option>
+                    <option value="group_nitro">ニトロ基 (-NO₂)</option>
                 </optgroup>
                 <optgroup label="反応・性質">
-                    <option value="reaction_acid" data-type="bool">酸性を示す (青色リトマス紙を赤変)</option>
-                    <option value="reaction_silver" data-type="bool">銀鏡反応を示す (還元性あり)</option>
+                    <option value="reaction_acid" data-type="bool">酸性を示す</option>
+                    <option value="reaction_silver" data-type="bool">銀鏡反応を示す</option>
                     <option value="reaction_iodoform" data-type="bool">ヨードホルム反応を示す</option>
-                    <option value="reaction_fe" data-type="bool">塩化鉄(III)で紫を呈する (フェノール類)</option>
-                    <option value="reaction_sodium" data-type="bool">金属ナトリウムと反応して水素発生</option>
-                    <option value="reaction_bromine" data-type="bool">臭素水を脱色する (不飽和結合)</option>
-                    <option value="reaction_dehydrate" data-type="bool">加熱すると脱水して酸無水物になる</option>
+                    <option value="reaction_fe" data-type="bool">塩化鉄(III)で呈色する</option>
+                    <option value="reaction_sodium" data-type="bool">Naと反応してH₂発生</option>
+                    <option value="reaction_bromine" data-type="bool">臭素水を脱色する</option>
+                    <option value="reaction_dehydrate" data-type="bool">加熱で分子内脱水する</option>
                 </optgroup>
             </select>
         </div>
@@ -185,7 +188,7 @@
         </div>
 
         <div id="boolean-text-area" class="control-group hidden">
-            <span style="font-weight: bold; font-size: 1.1rem; color: #555;">を示しますか？ (Yes / No)</span>
+            <span style="font-weight: bold; color: #555;">を示しますか？</span>
         </div>
 
         <button class="btn-ask" onclick="askQuestion()">質問を送信</button>
@@ -204,66 +207,34 @@
 </div>
 
 <script>
-    // UI切り替え
     function updateFormUI() {
         const targetSelect = document.getElementById('target');
         const selectedOption = targetSelect.options[targetSelect.selectedIndex];
-        
         const isBoolean = selectedOption.getAttribute('data-type') === 'bool' 
-                          || selectedOption.value.startsWith('reaction_') 
-                          || selectedOption.value === 'is_chiral';
-
-        const numericArea = document.getElementById('numeric-input-area');
-        const booleanArea = document.getElementById('boolean-text-area');
-
-        if (isBoolean) {
-            numericArea.classList.add('hidden');
-            booleanArea.classList.remove('hidden');
-        } else {
-            numericArea.classList.remove('hidden');
-            booleanArea.classList.add('hidden');
-        }
+                          || selectedOption.parentElement.label === '反応・性質';
+        
+        document.getElementById('numeric-input-area').classList.toggle('hidden', isBoolean);
+        document.getElementById('boolean-text-area').classList.toggle('hidden', !isBoolean);
     }
 
-    // ゲーム開始（引数なし）
     async function startGame() {
-        await fetch('/api/reset', { 
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({}) // 難易度は送らない
-        });
+        await fetch('/api/reset', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
         document.getElementById('logs').innerHTML = '';
         document.getElementById('guessName').value = '';
         updateTurn(0);
         document.getElementById('overlay-screen').style.display = 'none';
-        document.getElementById('start-content').style.display = 'block';
         document.getElementById('result-content').style.display = 'none';
-        
-        document.getElementById('target').selectedIndex = 0;
-        updateFormUI();
         window.scrollTo(0,0);
     }
 
-    // 質問
     async function askQuestion() {
         const targetSelect = document.getElementById('target');
-        const target = targetSelect.value;
         const selectedOption = targetSelect.options[targetSelect.selectedIndex];
+        const target = targetSelect.value;
+        const isBoolean = !document.getElementById('boolean-text-area').classList.contains('hidden');
         
-        const isBoolean = selectedOption.getAttribute('data-type') === 'bool' 
-                          || target.startsWith('reaction_') 
-                          || target === 'is_chiral';
-        
-        let value, operator;
-        if (isBoolean) {
-            value = 1;
-            operator = 'equal';
-        } else {
-            value = document.getElementById('value').value;
-            operator = document.getElementById('operator').value;
-        }
-
-        const targetText = selectedOption.text;
+        let value = isBoolean ? 1 : document.getElementById('value').value;
+        let operator = isBoolean ? 'equal' : document.getElementById('operator').value;
 
         const response = await fetch('/api/ask', {
             method: 'POST',
@@ -274,117 +245,66 @@
         const data = await response.json();
         updateTurn(data.currentTurn);
         const isYes = data.answer === "はい";
-
-        let questionText = "";
-        if (isBoolean) {
-            questionText = `Q. ${targetText} を示しますか？`;
-            if (target === 'is_chiral') questionText = "Q. 不斉炭素原子を持っていますか？";
-        } else {
-            const opText = getOpText(operator);
-            questionText = `Q. ${targetText} は ${value} ${opText} ですか？`;
-        }
         
-        addLog(questionText, `A. ${data.answer} ${isYes ? '⭕' : '❌'}`, isYes ? "yes" : "no");
+        const qText = isBoolean ? `Q. ${selectedOption.text} を示しますか？` : `Q. ${selectedOption.text} は ${value} ${getOpText(operator)} ですか？`;
+        addLog(qText, `A. ${data.answer} ${isYes ? '⭕' : '❌'}`, isYes ? "yes" : "no");
     }
 
-    // 回答
     async function guessAnswer() {
         const name = document.getElementById('guessName').value;
         if(!name) return;
-
-        const response = await fetch('/api/guess', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name })
-        });
-
+        const response = await fetch('/api/guess', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name }) });
         const data = await response.json();
-        
-        if (data.correct) {
-            showResult(name, data.finalTurn, data.image, data.formula, false);
-        } else {
-            updateTurn(data.currentTurn);
-            alert("違います...");
-            addLog(`回答: ${name}`, "不正解... 💨", "no");
-        }
+        if (data.correct) showResult(name, data.finalTurn, data.image, data.formula, false);
+        else { updateTurn(data.currentTurn); alert("違います..."); addLog(`回答: ${name}`, "不正解... 💨", "no"); }
     }
 
-    // ギブアップ
     async function giveUp() {
         if(!confirm("本当に降参しますか？")) return;
         const response = await fetch('/api/giveup', { method: 'POST' });
         const data = await response.json();
-        addLog("降参しました...", "Give Up", "giveup");
         showResult(data.name, data.turnCount, data.image, data.formula, true);
     }
 
-    // 結果表示（★ランク基準を中間設定に統一）
     function showResult(name, turns, imageFile, formula, isGiveUp) {
-        const titleEl = document.getElementById('result-title');
-        const rankEl = document.getElementById('result-rank');
-
         document.getElementById('result-name').innerText = name;
         document.getElementById('result-turns').innerText = turns;
+        document.getElementById('result-formula').innerHTML = formula ? formula.replace(/(\d+)/g, "<sub>$1</sub>") : "";
         
-        const formulaEl = document.getElementById('result-formula');
-        if (formula) {
-            formulaEl.innerHTML = formula.replace(/(\d+)/g, "<sub>$1</sub>");
-        } else {
-            formulaEl.innerText = "";
-        }
+        const img = document.getElementById('result-image');
+        if (imageFile) { img.src = "/images/" + imageFile; img.style.display = "inline-block"; }
+        else { img.style.display = "none"; }
 
-        const imgElement = document.getElementById('result-image');
-        if (imageFile) {
-            imgElement.src = "/images/" + imageFile;
-            imgElement.style.display = "inline-block";
-        } else {
-            imgElement.style.display = "none";
-        }
+        const title = document.getElementById('result-title');
+        const rankEl = document.getElementById('result-rank');
+        const shareBtn = document.getElementById('share-button');
 
         if (isGiveUp) {
-            titleEl.innerText = "😵 GIVE UP...";
-            titleEl.style.color = "#7f8c8d";
-            rankEl.innerText = "";
+            title.innerText = "😵 GIVE UP..."; title.style.color = "#7f8c8d"; rankEl.innerText = ""; shareBtn.style.display = 'none';
         } else {
-            titleEl.innerText = "🎉 CONGRATULATIONS!";
-            titleEl.style.color = "#27ae60";
-            
-            // ★新しいランク基準（全モード統一）
-            // S: 5ターン以内 (理論値)
-            // A: 8ターン以内 (少し余裕)
-            // B: 12ターン以内 (探索的)
-            let rank = "C";
-            if (turns <= 5) rank = "S (神業)";
-            else if (turns <= 8) rank = "A (優秀)";
-            else if (turns <= 12) rank = "B (普通)";
-            
+            title.innerText = "🎉 CONGRATULATIONS!"; title.style.color = "#27ae60";
+            let rank = turns <= 5 ? "S (神業)" : turns <= 8 ? "A (優秀)" : turns <= 12 ? "B (普通)" : "C";
             rankEl.innerText = rank;
+            shareBtn.style.display = 'flex';
+            shareBtn.onclick = () => {
+                const text = `【有機化学構造決定クイズ】\n正解の「${name}」を ${turns} ターンで特定しました！\nランク: ${rank}\n#有機化学クイズ #九工大`;
+                window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(window.location.href)}`, '_blank');
+            };
         }
-
         document.getElementById('overlay-screen').style.display = 'flex';
         document.getElementById('start-content').style.display = 'none';
         document.getElementById('result-content').style.display = 'block';
     }
 
-    function updateTurn(count) {
-        document.getElementById('turn-display').innerText = count;
-    }
-
+    function updateTurn(count) { document.getElementById('turn-display').innerText = count; }
     function addLog(q, a, type) {
         const div = document.createElement('div');
         div.className = `log-item ${type}`;
         div.innerHTML = `<span>${q}</span><span style="font-weight:bold">${a}</span>`;
         document.getElementById('logs').prepend(div);
     }
-
-    function getOpText(op) {
-        if(op === 'equal') return 'と同じ';
-        if(op === 'gte') return '以上';
-        if(op === 'lte') return '以下';
-    }
-
+    function getOpText(op) { return op === 'equal' ? 'と同じ' : op === 'gte' ? '以上' : '以下'; }
     window.onload = updateFormUI;
 </script>
-
 </body>
 </html>

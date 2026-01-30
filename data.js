@@ -1,167 +1,71 @@
-const compounds = [
-    /* =========================
-       Level 1: 基礎・脂肪族 (Easy)
-       ========================= */
-    { 
-        id: 1, name: "メタン", difficulty: "easy", 
-        C: 1, H: 4, O: 0, formula: "CH4", image: "methane.png" 
-    },
-    { 
-        id: 2, name: "エチレン", difficulty: "easy", 
-        C: 2, H: 4, O: 0, double_bond: 1, formula: "C2H4", image: "ethylene.png",
-        reaction_bromine: 1 // 臭素水の脱色
-    },
-    { 
-        id: 3, name: "アセチレン", difficulty: "easy", 
-        C: 2, H: 2, O: 0, triple_bond: 1, formula: "C2H2", image: "acetylene.png",
-        reaction_bromine: 1
-    },
-    { 
-        id: 4, name: "エタノール", difficulty: "easy", 
-        C: 2, H: 6, O: 1, group_oh: 1, formula: "C2H5OH", image: "ethanol.png",
-        reaction_iodoform: 1, reaction_sodium: 1
-    },
-    { 
-        id: 5, name: "酢酸", difficulty: "easy", 
-        C: 2, H: 4, O: 2, group_cooh: 1, double_bond_total: 1, formula: "CH3COOH", image: "acetic_acid.png",
-        reaction_acid: 1 // 酸性を示す
-    },
-    { 
-        id: 6, name: "アセトン", difficulty: "easy", 
-        C: 3, H: 6, O: 1, group_co: 1, double_bond_total: 1, formula: "CH3COCH3", image: "acetone.png",
-        reaction_iodoform: 1
-    },
+export const compounds = [
+    // --- 1-31: 基本セット ---
+    { id: 1, name: "メタン", formula: "CH4", image: "methane.png", C: 1, H: 4, O: 0, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 0, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 0, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 2, name: "エタン", formula: "C2H6", image: "ethane.png", C: 2, H: 6, O: 0, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 0, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 0, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 3, name: "プロパン", formula: "C3H8", image: "propane.png", C: 3, H: 8, O: 0, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 0, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 0, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 4, name: "アセチレン", formula: "C2H2", image: "acetylene.png", C: 2, H: 2, O: 0, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 1, ring_benzene: 0, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 0, reaction_bromine: 1, reaction_dehydrate: 0 },
+    { id: 5, name: "メタノール", formula: "CH4O", image: "methanol.png", C: 1, H: 4, O: 1, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 0, is_chiral: 0, group_oh: 1, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 1, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 6, name: "エタノール", formula: "C2H6O", image: "ethanol.png", C: 2, H: 6, O: 1, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 0, is_chiral: 0, group_oh: 1, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 1, reaction_fe: 0, reaction_sodium: 1, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 7, name: "ジメチルエーテル", formula: "C2H6O", image: "dimethylether.png", C: 2, H: 6, O: 1, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 0, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 1, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 0, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 8, name: "ホルムアルデヒド", formula: "CH2O", image: "formaldehyde.png", C: 1, H: 2, O: 1, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 0, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 1, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 1, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 0, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 9, name: "アセトアルデヒド", formula: "C2H4O", image: "acetaldehyde.png", C: 2, H: 4, O: 1, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 0, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 1, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 1, reaction_iodoform: 1, reaction_fe: 0, reaction_sodium: 0, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 10, name: "アセトン", formula: "C3H6O", image: "acetone.png", C: 3, H: 6, O: 1, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 0, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 0, group_co: 1, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 1, reaction_fe: 0, reaction_sodium: 0, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 11, name: "ギ酸", formula: "CH2O2", image: "formic_acid.png", C: 1, H: 2, O: 2, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 0, is_chiral: 0, group_oh: 0, group_cooh: 1, group_cho: 1, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 1, reaction_silver: 1, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 1, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 12, name: "酢酸", formula: "C2H4O2", image: "acetic_acid.png", C: 2, H: 4, O: 2, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 0, is_chiral: 0, group_oh: 0, group_cooh: 1, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 1, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 1, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 13, name: "酢酸エチル", formula: "C4H8O2", image: "ethyl_acetate.png", C: 4, H: 8, O: 2, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 0, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 1, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 0, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 14, name: "ベンゼン", formula: "C6H6", image: "benzene.png", C: 6, H: 6, O: 0, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 1, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 0, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 15, name: "トルエン", formula: "C7H8", image: "toluene.png", C: 7, H: 8, O: 0, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 1, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 0, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 16, name: "フェノール", formula: "C6H6O", image: "phenol.png", C: 6, H: 6, O: 1, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 1, is_chiral: 0, group_oh: 1, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 1, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 1, reaction_sodium: 1, reaction_bromine: 1, reaction_dehydrate: 0 },
+    { id: 17, name: "アニリン", formula: "C6H7N", image: "aniline.png", C: 6, H: 7, O: 0, N: 1, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 1, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 1, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 0, reaction_bromine: 1, reaction_dehydrate: 0 },
+    { id: 18, name: "ニトロベンゼン", formula: "C6H5NO2", image: "nitrobenzene.png", C: 6, H: 5, O: 2, N: 1, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 1, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 1, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 0, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 19, name: "安息香酸", formula: "C7H6O2", image: "benzoic_acid.png", C: 7, H: 6, O: 2, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 1, is_chiral: 0, group_oh: 0, group_cooh: 1, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 1, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 1, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 20, name: "サリチル酸", formula: "C7H6O3", image: "salicylic_acid.png", C: 7, H: 6, O: 3, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 1, is_chiral: 0, group_oh: 1, group_cooh: 1, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 1, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 1, reaction_sodium: 1, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 21, name: "アジピン酸", formula: "C6H10O4", image: "adipic_acid.png", C: 6, H: 10, O: 4, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 0, is_chiral: 0, group_oh: 0, group_cooh: 2, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 1, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 1, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 22, name: "テレフタル酸", formula: "C8H6O4", image: "terephthalic_acid.png", C: 8, H: 6, O: 4, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 1, is_chiral: 0, group_oh: 0, group_cooh: 2, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 1, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 1, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 23, name: "乳酸", formula: "C3H6O3", image: "lactic_acid.png", C: 3, H: 6, O: 3, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 0, is_chiral: 1, group_oh: 1, group_cooh: 1, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 1, reaction_silver: 0, reaction_iodoform: 1, reaction_fe: 0, reaction_sodium: 1, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 24, name: "マロン酸", formula: "C3H4O4", image: "malonic_acid.png", C: 3, H: 4, O: 4, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 0, is_chiral: 0, group_oh: 0, group_cooh: 2, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 1, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 1, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 25, name: "1,2-ジブロモエタン", formula: "C2H4Br2", image: "dibromoethane.png", C: 2, H: 4, O: 0, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 0, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 0, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 26, name: "クレゾール", formula: "C7H8O", image: "cresol.png", C: 7, H: 8, O: 1, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 1, is_chiral: 0, group_oh: 1, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 1, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 1, reaction_sodium: 1, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 27, name: "アニソール", formula: "C7H8O", image: "anisole.png", C: 7, H: 8, O: 1, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 1, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 1, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 0, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 28, name: "ベンジルアルコール", formula: "C7H8O", image: "benzyl_alcohol.png", C: 7, H: 8, O: 1, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 1, is_chiral: 0, group_oh: 1, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 1, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 29, name: "p-キシレン", formula: "C8H10", image: "p_xylene.png", C: 8, H: 10, O: 0, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 1, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 0, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 30, name: "マレイン酸無水物", formula: "C4H2O3", image: "maleic_anhydride.png", C: 4, H: 2, O: 3, N: 0, S: 0, Cl: 0, double_bond: 1, triple_bond: 0, ring_benzene: 0, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 0, reaction_bromine: 1, reaction_dehydrate: 0 },
+    { id: 31, name: "無水フタル酸", formula: "C8H4O3", image: "phthalic_anhydride.png", C: 8, H: 4, O: 3, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 1, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 0, reaction_bromine: 0, reaction_dehydrate: 0 },
 
-    /* =========================
-       Level 2: 応用・芳香族 (Hard)
-       ========================= */
-    
-    // --- アルデヒド・エーテル ---
-    { 
-        id: 7, name: "ホルムアルデヒド", difficulty: "hard", 
-        C: 1, H: 2, O: 1, group_cho: 1, double_bond_total: 1, formula: "HCHO", image: "formaldehyde.png",
-        reaction_silver: 1 // 銀鏡反応（還元性）
-    },
-    { 
-        id: 8, name: "アセトアルデヒド", difficulty: "hard", 
-        C: 2, H: 4, O: 1, group_cho: 1, double_bond_total: 1, formula: "CH3CHO", image: "acetaldehyde.png",
-        reaction_silver: 1, reaction_iodoform: 1
-    },
-    { 
-        id: 9, name: "ジメチルエーテル", difficulty: "hard", 
-        C: 2, H: 6, O: 1, group_ether: 1, formula: "CH3OCH3", image: "dimethyl_ether.png"
-    },
-    { 
-        id: 10, name: "ジエチルエーテル", difficulty: "hard", 
-        C: 4, H: 10, O: 1, group_ether: 1, formula: "(C2H5)2O", image: "diethyl_ether.png"
-    },
+    // --- 32-46: スルホン酸・位置異性体セット ---
+    { id: 32, name: "ベンゼンスルホン酸", formula: "C6H6O3S", image: "benzenesulfonic_acid.png", C: 6, H: 6, O: 3, N: 0, S: 1, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 1, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 1, group_amide: 0, group_nitro: 0, reaction_acid: 1, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 1, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 33, name: "p-トルエンスルホン酸", formula: "C7H8O3S", image: "p_toluenesulfonic_acid.png", C: 7, H: 8, O: 3, N: 0, S: 1, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 1, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 1, group_amide: 0, group_nitro: 0, reaction_acid: 1, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 1, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 34, name: "スルファニル酸", formula: "C6H7NO3S", image: "sulfanilic_acid.png", C: 6, H: 7, O: 3, N: 1, S: 1, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 1, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 1, group_so3h: 1, group_amide: 0, group_nitro: 0, reaction_acid: 1, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 1, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 35, name: "1-プロパノール", formula: "C3H8O", image: "1_propanol.png", C: 3, H: 8, O: 1, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 0, is_chiral: 0, group_oh: 1, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 1, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 36, name: "2-プロパノール", formula: "C3H8O", image: "2_propanol.png", C: 3, H: 8, O: 1, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 0, is_chiral: 0, group_oh: 1, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 1, reaction_fe: 0, reaction_sodium: 1, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 37, name: "ギ酸エチル", formula: "C3H6O2", image: "ethyl_formate.png", C: 3, H: 6, O: 2, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 0, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 1, group_co: 0, group_ether: 0, group_ester: 1, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 1, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 0, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 38, name: "酢酸メチル", formula: "C3H6O2", image: "methyl_acetate.png", C: 3, H: 6, O: 2, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 0, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 1, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 0, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 39, name: "エチレングリコール", formula: "C2H6O2", image: "ethylene_glycol.png", C: 2, H: 6, O: 2, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 0, is_chiral: 0, group_oh: 2, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 1, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 40, name: "グリセリン", formula: "C3H8O3", image: "glycerin.png", C: 3, H: 8, O: 3, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 0, is_chiral: 0, group_oh: 3, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 1, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 41, name: "グリシン", formula: "C2H5NO2", image: "glycine.png", C: 2, H: 5, O: 2, N: 1, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 0, is_chiral: 0, group_oh: 0, group_cooh: 1, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 1, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 1, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 1, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 42, name: "アラニン", formula: "C3H7NO2", image: "alanine.png", C: 3, H: 7, O: 2, N: 1, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 0, is_chiral: 1, group_oh: 0, group_cooh: 1, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 1, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 1, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 1, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 43, name: "o-キシレン", formula: "C8H10", image: "o_xylene.png", C: 8, H: 10, O: 0, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 1, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 0, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 44, name: "m-キシレン", formula: "C8H10", image: "m_xylene.png", C: 8, H: 10, O: 0, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 1, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 0, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 45, name: "フタル酸", formula: "C8H6O4", image: "phthalic_acid.png", C: 8, H: 6, O: 4, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 1, is_chiral: 0, group_oh: 0, group_cooh: 2, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 1, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 1, reaction_bromine: 0, reaction_dehydrate: 1 },
+    { id: 46, name: "ナフタレン", formula: "C10H8", image: "naphthalene.png", C: 10, H: 8, O: 0, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 2, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 0, reaction_bromine: 0, reaction_dehydrate: 0 },
 
-    // --- カルボン酸・エステル ---
-    { 
-        id: 11, name: "ギ酸", difficulty: "hard", 
-        C: 1, H: 2, O: 2, group_cooh: 1, group_cho: 1, double_bond_total: 1, formula: "HCOOH", image: "formic_acid.png",
-        reaction_acid: 1, reaction_silver: 1
-    },
-    { 
-        id: 12, name: "酢酸エチル", difficulty: "hard", 
-        C: 4, H: 8, O: 2, group_ester: 1, double_bond_total: 1, formula: "CH3COOC2H5", image: "ethyl_acetate.png"
-    },
-    { 
-        id: 13, name: "無水酢酸", difficulty: "hard", 
-        C: 4, H: 6, O: 3, group_ester: 2, double_bond_total: 2, formula: "(CH3CO)2O", image: "acetic_anhydride.png"
-    },
-    { 
-        id: 14, name: "シュウ酸", difficulty: "hard", 
-        C: 2, H: 2, O: 4, group_cooh: 2, double_bond_total: 2, formula: "(COOH)2", image: "oxalic_acid.png",
-        reaction_acid: 1, reaction_silver: 1
-    },
-
-    // --- 立体異性体 ---
-    { 
-        id: 15, name: "マレイン酸", difficulty: "hard", 
-        C: 4, H: 4, O: 4, group_cooh: 2, double_bond: 1, double_bond_total: 3, formula: "C4H4O4 (cis)", image: "maleic_acid.png",
-        reaction_acid: 1, reaction_dehydrate: 1
-    },
-    { 
-        id: 16, name: "フマル酸", difficulty: "hard", 
-        C: 4, H: 4, O: 4, group_cooh: 2, double_bond: 1, double_bond_total: 3, formula: "C4H4O4 (trans)", image: "fumaric_acid.png",
-        reaction_acid: 1
-    },
-    { 
-        id: 17, name: "乳酸", difficulty: "hard", 
-        C: 3, H: 6, O: 3, group_oh: 1, group_cooh: 1, double_bond_total: 1, formula: "CH3CH(OH)COOH", image: "lactic_acid.png",
-        reaction_acid: 1, is_chiral: 1
-    },
-
-    // --- 芳香族（基礎） ---
-    { 
-        id: 18, name: "ベンゼン", difficulty: "hard", 
-        C: 6, H: 6, O: 0, ring_benzene: 1, double_bond_total: 3, formula: "C6H6", image: "benzene.png"
-    },
-    { 
-        id: 19, name: "トルエン", difficulty: "hard", 
-        C: 7, H: 8, O: 0, ring_benzene: 1, double_bond_total: 3, formula: "C6H5CH3", image: "toluene.png"
-    },
-    { 
-        id: 20, name: "スチレン", difficulty: "hard", 
-        C: 8, H: 8, O: 0, ring_benzene: 1, double_bond: 1, double_bond_total: 4, formula: "C6H5CH=CH2", image: "styrene.png",
-        reaction_bromine: 1
-    },
-    { 
-        id: 21, name: "p-キシレン", difficulty: "hard", 
-        C: 8, H: 10, O: 0, ring_benzene: 1, double_bond_total: 3, formula: "C6H4(CH3)2", image: "p-xylene.png"
-    },
-    { 
-        id: 22, name: "ベンズアルデヒド", difficulty: "hard", 
-        C: 7, H: 6, O: 1, ring_benzene: 1, group_cho: 1, double_bond_total: 4, formula: "C6H5CHO", image: "benzaldehyde.png",
-        reaction_silver: 1
-    },
-    { 
-        id: 23, name: "ピクリン酸", difficulty: "hard", 
-        C: 6, H: 3, N: 3, O: 7, ring_benzene: 1, group_oh: 1, double_bond_total: 9, formula: "C6H2(OH)(NO2)3", image: "picric_acid.png",
-        reaction_acid: 1
-    },
-
-    // --- 芳香族（応用・医薬品） ---
-    { 
-        id: 24, name: "フェノール", difficulty: "hard", 
-        C: 6, H: 6, O: 1, ring_benzene: 1, group_oh: 1, double_bond_total: 3, formula: "C6H5OH", image: "phenol.png",
-        reaction_fe: 1, reaction_sodium: 1, reaction_acid: 1
-    },
-    { 
-        id: 25, name: "安息香酸", difficulty: "hard", 
-        C: 7, H: 6, O: 2, ring_benzene: 1, group_cooh: 1, double_bond_total: 4, formula: "C6H5COOH", image: "benzoic_acid.png",
-        reaction_acid: 1
-    },
-    { 
-        id: 26, name: "アニリン", difficulty: "hard", 
-        C: 6, H: 7, N: 1, ring_benzene: 1, group_nh2: 1, double_bond_total: 3, formula: "C6H5NH2", image: "aniline.png"
-    },
-    { 
-        id: 27, name: "アセチルサリチル酸", difficulty: "hard", 
-        C: 9, H: 8, O: 4, ring_benzene: 1, group_cooh: 1, group_ester: 1, double_bond_total: 5, formula: "C6H4(OCOCH3)COOH", image: "aspirin.png",
-        reaction_acid: 1
-    },
-    { 
-        id: 28, name: "サリチル酸メチル", difficulty: "hard", 
-        C: 8, H: 8, O: 3, ring_benzene: 1, group_oh: 1, group_ester: 1, double_bond_total: 4, formula: "C6H4(OH)COOCH3", image: "methyl_salicylate.png",
-        reaction_fe: 1
-    },
-    { 
-        id: 29, name: "テレフタル酸", difficulty: "hard", 
-        C: 8, H: 6, O: 4, ring_benzene: 1, group_cooh: 2, double_bond_total: 5, formula: "C6H4(COOH)2", image: "terephthalic_acid.png",
-        reaction_acid: 1
-    },
-    { 
-        id: 30, name: "ニトロベンゼン", difficulty: "hard", 
-        C: 6, H: 5, N: 1, O: 2, ring_benzene: 1, double_bond_total: 4, formula: "C6H5NO2", image: "nitrobenzene.png"
-    },
-    // ★追加したサリチル酸
-    { 
-        id: 31, name: "サリチル酸", difficulty: "hard", 
-        C: 7, H: 6, O: 3, ring_benzene: 1, group_oh: 1, group_cooh: 1, double_bond_total: 4, formula: "C6H4(OH)COOH", image: "salicylic_acid.png",
-        reaction_fe: 1, reaction_acid: 1, reaction_sodium: 1
-    }
+    // --- 47-64: 糖・高分子・医薬セット ---
+    { id: 47, name: "グルコース", formula: "C6H12O6", image: "glucose.png", C: 6, H: 12, O: 6, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 0, is_chiral: 1, group_oh: 5, group_cooh: 0, group_cho: 1, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 1, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 1, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 48, name: "フルクトース", formula: "C6H12O6", image: "fructose.png", C: 6, H: 12, O: 6, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 0, is_chiral: 1, group_oh: 5, group_cooh: 0, group_cho: 0, group_co: 1, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 1, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 1, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 49, name: "スクロース", formula: "C12H22O11", image: "sucrose.png", C: 12, H: 22, O: 11, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 0, is_chiral: 1, group_oh: 8, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 1, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 1, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 50, name: "マルトース", formula: "C12H22O11", image: "maltose.png", C: 12, H: 22, O: 11, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 0, is_chiral: 1, group_oh: 8, group_cooh: 0, group_cho: 1, group_co: 0, group_ether: 1, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 1, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 1, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 51, name: "エチレン", formula: "C2H4", image: "ethylene.png", C: 2, H: 4, O: 0, N: 0, S: 0, Cl: 0, double_bond: 1, triple_bond: 0, ring_benzene: 0, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 0, reaction_bromine: 1, reaction_dehydrate: 0 },
+    { id: 52, name: "プロピレン", formula: "C3H6", image: "propylene.png", C: 3, H: 6, O: 0, N: 0, S: 0, Cl: 0, double_bond: 1, triple_bond: 0, ring_benzene: 0, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 0, reaction_bromine: 1, reaction_dehydrate: 0 },
+    { id: 53, name: "塩化ビニル", formula: "C2H3Cl", image: "vinyl_chloride.png", C: 2, H: 3, O: 0, N: 0, S: 0, Cl: 1, double_bond: 1, triple_bond: 0, ring_benzene: 0, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 0, reaction_bromine: 1, reaction_dehydrate: 0 },
+    { id: 54, name: "スチレン", formula: "C8H8", image: "styrene.png", C: 8, H: 8, O: 0, N: 0, S: 0, Cl: 0, double_bond: 1, triple_bond: 0, ring_benzene: 1, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 0, reaction_bromine: 1, reaction_dehydrate: 0 },
+    { id: 55, name: "アクリロニトリル", formula: "C3H3N", image: "acrylonitrile.png", C: 3, H: 3, O: 0, N: 1, S: 0, Cl: 0, double_bond: 1, triple_bond: 1, ring_benzene: 0, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 0, reaction_bromine: 1, reaction_dehydrate: 0 },
+    { id: 56, name: "メタクリル酸メチル", formula: "C5H8O2", image: "mma.png", C: 5, H: 8, O: 2, N: 0, S: 0, Cl: 0, double_bond: 1, triple_bond: 0, ring_benzene: 0, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 1, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 0, reaction_bromine: 1, reaction_dehydrate: 0 },
+    { id: 57, name: "アセチルサリチル酸", formula: "C9H8O4", image: "aspirin.png", C: 9, H: 8, O: 4, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 1, is_chiral: 0, group_oh: 0, group_cooh: 1, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 1, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 1, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 1, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 58, name: "サリチル酸メチル", formula: "C8H8O3", image: "methyl_salicylate.png", C: 8, H: 8, O: 3, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 1, is_chiral: 0, group_oh: 1, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 1, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 1, reaction_sodium: 1, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 59, name: "アセトアニリド", formula: "C8H9NO", image: "acetanilide.png", C: 8, H: 9, O: 1, N: 1, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 1, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 1, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 0, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 60, name: "クロロホルム", formula: "CHCl3", image: "chloroform.png", C: 1, H: 1, O: 0, N: 0, S: 0, Cl: 3, double_bond: 0, triple_bond: 0, ring_benzene: 0, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 0, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 61, name: "マレイン酸", formula: "C4H4O4", image: "maleic_acid.png", C: 4, H: 4, O: 4, N: 0, S: 0, Cl: 0, double_bond: 1, triple_bond: 0, ring_benzene: 0, is_chiral: 0, group_oh: 0, group_cooh: 2, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 1, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 1, reaction_bromine: 1, reaction_dehydrate: 1 },
+    { id: 62, name: "フマル酸", formula: "C4H4O4", image: "fumaric_acid.png", C: 4, H: 4, O: 4, N: 0, S: 0, Cl: 0, double_bond: 1, triple_bond: 0, ring_benzene: 0, is_chiral: 0, group_oh: 0, group_cooh: 2, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 1, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 1, reaction_bromine: 1, reaction_dehydrate: 0 },
+    { id: 63, name: "ピクリン酸", formula: "C6H3N3O7", image: "picric_acid.png", C: 6, H: 3, O: 7, N: 3, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 1, is_chiral: 0, group_oh: 1, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 3, reaction_acid: 1, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 1, reaction_sodium: 1, reaction_bromine: 0, reaction_dehydrate: 0 },
+    { id: 64, name: "トリニトロトルエン", formula: "C7H5N3O6", image: "tnt.png", C: 7, H: 5, O: 6, N: 3, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 1, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 3, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 0, reaction_bromine: 0, reaction_dehydrate: 0 }
 ];
-
-module.exports = compounds;
