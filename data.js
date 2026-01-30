@@ -1,4 +1,4 @@
-export const compounds = [
+const compounds = [
     // --- 1-31: 基本セット ---
     { id: 1, name: "メタン", formula: "CH4", image: "methane.png", C: 1, H: 4, O: 0, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 0, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 0, reaction_bromine: 0, reaction_dehydrate: 0 },
     { id: 2, name: "エタン", formula: "C2H6", image: "ethane.png", C: 2, H: 6, O: 0, N: 0, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 0, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 0, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 0, reaction_bromine: 0, reaction_dehydrate: 0 },
@@ -69,3 +69,5 @@ export const compounds = [
     { id: 63, name: "ピクリン酸", formula: "C6H3N3O7", image: "picric_acid.png", C: 6, H: 3, O: 7, N: 3, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 1, is_chiral: 0, group_oh: 1, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 3, reaction_acid: 1, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 1, reaction_sodium: 1, reaction_bromine: 0, reaction_dehydrate: 0 },
     { id: 64, name: "トリニトロトルエン", formula: "C7H5N3O6", image: "tnt.png", C: 7, H: 5, O: 6, N: 3, S: 0, Cl: 0, double_bond: 0, triple_bond: 0, ring_benzene: 1, is_chiral: 0, group_oh: 0, group_cooh: 0, group_cho: 0, group_co: 0, group_ether: 0, group_ester: 0, group_nh2: 0, group_so3h: 0, group_amide: 0, group_nitro: 3, reaction_acid: 0, reaction_silver: 0, reaction_iodoform: 0, reaction_fe: 0, reaction_sodium: 0, reaction_bromine: 0, reaction_dehydrate: 0 }
 ];
+
+module.exports = { compounds };
