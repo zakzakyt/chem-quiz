@@ -1,109 +1,108 @@
 const express = require('express');
 const app = express();
-const compounds = require('./data'); // data.jsを読み込む
+const compounds = require('./data'); // 修正済みのデータ配列
 
 app.set('view engine', 'ejs');
+app.use(express.static('public'));
 app.use(express.json());
-app.use(express.static('public')); // 画像フォルダ公開
 
-let secretCompound = null;
-let turnCount = 0;
+let currentSession = {
+    targetId: null,
+    turnCount: 0,
+    history: [] // 質問の履歴（フィルタ条件）を保存
+};
 
-// ゲーム開始・リセット処理
-function startNewGame() {
-    // ★修正: 難易度に関係なく、常にすべての化合物(compounds)を候補にする
-    let candidates = compounds;
-    
-    // ランダム選択
-    const randomIndex = Math.floor(Math.random() * candidates.length);
-    secretCompound = candidates[randomIndex];
-    turnCount = 0;
-    
-    console.log(`[統一モード] 新しい正解: ${secretCompound.name} (ID: ${secretCompound.id})`);
+// 判定ロジック関数（全化合物へのフィルタリングで再利用するため独立化）
+function checkCondition(compound, targetProp, value, operator) {
+    const compoundValue = compound[targetProp];
+    const numValue = parseInt(value, 10);
+
+    // ブール値（フラグ）の場合の処理
+    if (["reaction_acid", "reaction_silver", "reaction_iodoform", "reaction_fe", "reaction_sodium", "reaction_bromine", "reaction_dehydrate", "is_chiral"].includes(targetProp)) {
+        return (compoundValue === 1) === (numValue === 1); // 1ならYes
+    }
+
+    // 数値比較の場合
+    if (operator === 'equal') return compoundValue === numValue;
+    if (operator === 'gte') return compoundValue >= numValue;
+    if (operator === 'lte') return compoundValue <= numValue;
+    return false;
 }
 
-// サーバー起動時に一度実行
-startNewGame('easy');
-
-// トップページ
 app.get('/', (req, res) => {
     res.render('index');
 });
 
-// 質問API
+app.post('/api/reset', (req, res) => {
+    const randomTarget = compounds[Math.floor(Math.random() * compounds.length)];
+    currentSession = {
+        targetId: randomTarget.id,
+        turnCount: 0,
+        history: [] // 履歴をリセット
+    };
+    console.log(`[RESET] 新しい正解: ${randomTarget.name} (ID: ${randomTarget.id})`);
+    // リセット時は全件数が残り候補
+    res.json({ message: "Reset complete", totalCandidates: compounds.length });
+});
+
 app.post('/api/ask', (req, res) => {
-    // サーバー再起動直後などのエラー防止
-    if (!secretCompound) startNewGame('easy');
-
     const { target, value, operator } = req.body;
-    turnCount++;
+    currentSession.turnCount++;
 
-    // 元々の値を取得
-    let actualValue = secretCompound[target] || 0;
-
-    // ★修正ポイント：化学的なルールの補正
-    // 「二重結合」について聞かれた場合、ベンゼン環があれば「+3個」としてカウントする
-    if (target === 'double_bond') {
-        const explicitDouble = secretCompound.double_bond || 0; // 側鎖の二重結合（スチレンなど）
-        const benzeneCount = secretCompound.ring_benzene || 0;  // ベンゼン環の数
-        
-        // 合計 = 側鎖の分 + (ベンゼン環 × 3)
-        actualValue = explicitDouble + (benzeneCount * 3);
-    }
-
-    const userValue = Number(value);
-    let isYes = false;
-
-    // 判定ロジック
-    switch (operator) {
-        case 'equal': isYes = (actualValue === userValue); break;
-        case 'gte':   isYes = (actualValue >= userValue); break;
-        case 'lte':   isYes = (actualValue <= userValue); break;
-    }
-
-    res.json({ answer: isYes ? "はい" : "いいえ", currentTurn: turnCount });
-});
-
-// 回答API
-app.post('/api/guess', (req, res) => {
-    if (!secretCompound) startNewGame('easy');
-
-    const { name } = req.body;
-    turnCount++;
-
-    if (secretCompound.name === name) {
-        res.json({ 
-            correct: true, 
-            finalTurn: turnCount,
-            image: secretCompound.image,
-            formula: secretCompound.formula
-        });
-    } else {
-        res.json({ correct: false, currentTurn: turnCount });
-    }
-});
-
-// ギブアップAPI
-app.post('/api/giveup', (req, res) => {
-    if (!secretCompound) startNewGame('easy');
+    const targetCompound = compounds.find(c => c.id === currentSession.targetId);
     
+    // 1. 正解データに対する判定（Yes/No）
+    const isMatch = checkCondition(targetCompound, target, value, operator);
+    const answerStr = isMatch ? "はい" : "いいえ";
+
+    // 2. この質問結果を履歴に追加
+    // Yesなら「その条件を満たすもの」、Noなら「その条件を満たさないもの」が絞り込み条件になる
+    currentSession.history.push({
+        targetProp: target,
+        value: value,
+        operator: operator,
+        mustMatch: isMatch // trueなら条件合致が必須、falseなら条件不一致が必須
+    });
+
+    // 3. 全化合物をスキャンして、現在の履歴すべてに矛盾しない候補を数える
+    const remainingCandidates = compounds.filter(c => {
+        return currentSession.history.every(condition => {
+            const check = checkCondition(c, condition.targetProp, condition.value, condition.operator);
+            return condition.mustMatch ? check : !check;
+        });
+    });
+
     res.json({
-        name: secretCompound.name,
-        image: secretCompound.image,
-        formula: secretCompound.formula,
-        turnCount: turnCount
+        answer: answerStr,
+        currentTurn: currentSession.turnCount,
+        remainingCount: remainingCandidates.length // ★ここが新機能！
     });
 });
 
-// リセットAPI
-app.post('/api/reset', (req, res) => {
-    // ★修正: 難易度(difficulty)を受け取らず、単にスタートする
-    startNewGame();
-    res.json({ message: "OK" });
+app.post('/api/guess', (req, res) => {
+    const { name } = req.body;
+    currentSession.turnCount++;
+    const targetCompound = compounds.find(c => c.id === currentSession.targetId);
+    const correct = targetCompound.name === name;
+
+    res.json({
+        correct: correct,
+        currentTurn: currentSession.turnCount,
+        image: correct ? targetCompound.image : null,
+        finalTurn: currentSession.turnCount,
+        formula: correct ? targetCompound.formula : null
+    });
 });
 
-// サーバー起動
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`サーバーが起動しました: http://localhost:${PORT}`);
+app.post('/api/giveup', (req, res) => {
+    const targetCompound = compounds.find(c => c.id === currentSession.targetId);
+    res.json({
+        name: targetCompound.name,
+        image: targetCompound.image,
+        turnCount: currentSession.turnCount,
+        formula: targetCompound.formula
+    });
 });
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
