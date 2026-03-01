@@ -158,7 +158,6 @@
         <p>全68種類の有機化合物から<br>正解を特定してください</p>
         <button class="btn-start" onclick="startGame()">🚀 ゲームスタート</button>
         <button class="btn-zukan" onclick="openZukan('start-content')">📖 コンプリート図鑑 (<span id="start-zukan-count">0</span>/68)</button>
-        <button onclick="let cheat={};for(let i=1;i<=68;i++){cheat[i]=1;}localStorage.setItem('chemZukan',JSON.stringify(cheat));alert('図鑑コンプリート！画面を更新してください');" style="width: 100%; margin-top: 10px; padding: 12px; background: #34495e; color: white; border: none; border-radius: 6px;">🛠 開発者専用：図鑑全開放</button>
     </div> 
 
     <div id="zukan-content" class="modal-box" style="display:none; max-width: 800px; width: 95%;">
