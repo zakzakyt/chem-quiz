@@ -131,7 +131,10 @@
 <div class="container">
     <header class="header-info">
         <h1>🧞‍♂️ 有機化学アキネイター</h1>
-        <div class="turn-badge">現在: <span id="turn-display">0</span> ターン目</div>
+        <div style="display: flex; gap: 10px; justify-content: center;">
+            <div class="turn-badge">現在: <span id="turn-display">0</span> ターン目</div>
+            <div class="turn-badge" style="background: #e67e22;">候補: <span id="candidate-count">68</span> / 68</div>
+        </div>
     </header>
 
     <div class="card">
@@ -221,6 +224,7 @@
         await fetch('/api/reset', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
         document.getElementById('logs').innerHTML = '';
         document.getElementById('guessName').value = '';
+        document.getElementById('candidate-count').innerText = 68; // ★ここを追加
         updateTurn(0);
         document.getElementById('overlay-screen').style.display = 'none';
         document.getElementById('result-content').style.display = 'none';
@@ -242,12 +246,21 @@
             body: JSON.stringify({ target, value, operator })
         });
 
-        const data = await response.json();
+        const data = await response.json();        
         updateTurn(data.currentTurn);
+
+        // ★ここを追加: 残り候補数を更新
+        const countEl = document.getElementById('candidate-count');
+        countEl.innerText = data.remainingCount;
+
+        // アニメーション効果（数字が変わったことを強調）
+        countEl.parentElement.style.transform = "scale(1.2)";
+        setTimeout(() => countEl.parentElement.style.transform = "scale(1)", 200);
+
         const isYes = data.answer === "はい";
         
         const qText = isBoolean ? `Q. ${selectedOption.text} を示しますか？` : `Q. ${selectedOption.text} は ${value} ${getOpText(operator)} ですか？`;
-        addLog(qText, `A. ${data.answer} ${isYes ? '⭕' : '❌'}`, isYes ? "yes" : "no");
+        addLog(qText, `A. ${data.answer} ${isYes ? '⭕' : '❌'} (残り${data.remainingCount}件)`, isYes ? "yes" : "no");
     }
 
     async function guessAnswer() {
