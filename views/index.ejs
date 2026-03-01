@@ -207,7 +207,7 @@
 
         <div id="numeric-input-area" class="control-group">
             <span>の数が</span>
-            <input type="number" id="value" value="1" min="0" style="flex:1;">
+            <input type="number" id="value" value="1" min="0" style="flex:1;" onkeydown="if(event.key==='Enter') askQuestion()">
             <select id="operator" style="flex:1;">
                 <option value="equal">と同じ</option>
                 <option value="gte">以上 (≧)</option>
@@ -227,7 +227,7 @@
         <h3>💡 名前を答える</h3>
         <div class="control-group">
             <div class="autocomplete-wrapper">
-                <input type="text" id="guessName" placeholder="化合物名を入力 (例: ベンゼン)" style="width: 100%; box-sizing: border-box;" autocomplete="off">
+                <input type="text" id="guessName" placeholder="化合物名を入力 (例: ベンゼン)" style="width: 100%; box-sizing: border-box;" autocomplete="off" onkeydown="if(event.key==='Enter') guessAnswer()">
                 <div id="autocomplete-list" class="autocomplete-items"></div>
             </div>
         </div>
