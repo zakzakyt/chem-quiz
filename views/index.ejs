@@ -64,6 +64,14 @@
         button { border: none; padding: 12px 20px; border-radius: 6px; color: white; cursor: pointer; font-weight: bold; width: 100%; transition: opacity 0.2s; font-size: 1rem; }
         button:hover { opacity: 0.9; }
         
+        /* --- ローディング（無効化）時のボタンスタイル --- */
+        button:disabled {
+            background-color: #bdc3c7 !important; /* グレーにする */
+            cursor: not-allowed;
+            opacity: 0.8;
+            transform: none;
+        }
+
         .btn-ask { background-color: var(--primary-color); }
         .btn-guess { background-color: var(--warning-color); }
         .btn-giveup { background-color: #95a5a6; margin-top: 10px; font-size: 0.9rem; }
@@ -220,7 +228,7 @@
             <span style="font-weight: bold; color: #555;">を示しますか？</span>
         </div>
 
-        <button class="btn-ask" onclick="askQuestion()">質問を送信</button>
+        <button id="btn-ask" class="btn-ask" onclick="askQuestion()">質問を送信</button>
     </div>
 
     <div class="card">
@@ -231,8 +239,8 @@
                 <div id="autocomplete-list" class="autocomplete-items"></div>
             </div>
         </div>
-        <button class="btn-guess" onclick="guessAnswer()">回答する</button>
-        <button class="btn-giveup" onclick="giveUp()">降参して答えを見る...</button>
+        <button id="btn-guess" class="btn-guess" onclick="guessAnswer()">回答する</button>
+        <button id="btn-giveup" class="btn-giveup" onclick="giveUp()">降参して答えを見る...</button>
     </div>
 
     <div id="logs"></div>
@@ -318,7 +326,13 @@
         window.scrollTo(0,0);
     }
 
+    // --- 1. 質問する関数 ---
     async function askQuestion() {
+        const btn = document.getElementById('btn-ask');
+        const originalText = btn.innerText;
+        btn.innerText = '⏳ 判定中...';
+        btn.disabled = true;
+
         const targetSelect = document.getElementById('target');
         const selectedOption = targetSelect.options[targetSelect.selectedIndex];
         const target = targetSelect.value;
@@ -327,73 +341,99 @@
         let value = isBoolean ? 1 : document.getElementById('value').value;
         let operator = isBoolean ? 'equal' : document.getElementById('operator').value;
 
-        const response = await fetch('/api/ask', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ target, value, operator })
-        });
+        // ★ ここに「try {」が必要です！
+        try {
+            const response = await fetch('/api/ask', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ target, value, operator })
+            });
 
-        const data = await response.json();
-        updateTurn(data.currentTurn);
-        
-        const countEl = document.getElementById('candidate-count');
-        countEl.innerText = data.remainingCount;
-        countEl.parentElement.style.transform = "scale(1.2)";
-        setTimeout(() => countEl.parentElement.style.transform = "scale(1)", 200);
+            const data = await response.json();
+            updateTurn(data.currentTurn);
+            
+            const countEl = document.getElementById('candidate-count');
+            countEl.innerText = data.remainingCount;
+            countEl.parentElement.style.transform = "scale(1.2)";
+            setTimeout(() => countEl.parentElement.style.transform = "scale(1)", 200);
 
-        const isYes = data.answer === "はい";
-        
-        // --- 🔊 効果音の再生（質問判定） ---
-        if (isYes) {
-            seYes.currentTime = 0; // 連続で鳴らせるように再生位置をリセット
-            seYes.play();
-        } else {
-            seNo.currentTime = 0;
-            seNo.play();
+            const isYes = data.answer === "はい";
+            
+            if (isYes) {
+                seYes.currentTime = 0; 
+                seYes.play();
+            } else {
+                seNo.currentTime = 0;
+                seNo.play();
+            }
+
+            const qText = isBoolean ? `Q. ${selectedOption.text} を示しますか？` : `Q. ${selectedOption.text} は ${value} ${getOpText(operator)} ですか？`;
+            addLog(qText, `A. ${data.answer} ${isYes ? '⭕' : '❌'} (残り${data.remainingCount}件)`, isYes ? "yes" : "no");
+            
+        } finally { // ★ 上の try {} に対応する finally です
+            btn.innerText = originalText;
+            btn.disabled = false;
         }
-
-        const qText = isBoolean ? `Q. ${selectedOption.text} を示しますか？` : `Q. ${selectedOption.text} は ${value} ${getOpText(operator)} ですか？`;
-        addLog(qText, `A. ${data.answer} ${isYes ? '⭕' : '❌'} (残り${data.remainingCount}件)`, isYes ? "yes" : "no");
     }
 
+    // --- 2. 回答する関数 ---
     async function guessAnswer() {
         const name = document.getElementById('guessName').value;
         if(!name) return;
-        const response = await fetch('/api/guess', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name }) });
-        const data = await response.json();
-        
-        if (data.correct) {
-            // --- 🔊 効果音の再生（正解） ---
-            // ★ターン数が5以下（Sランク）なら特別な音を鳴らす
-            if (data.finalTurn <= 5) {
-                seCorrectS.currentTime = 0;
-                seCorrectS.play();
-            } else {
-                seCorrect.currentTime = 0;
-                seCorrect.play();
-            }
 
-            showResult(name, data.finalTurn, data.image, data.formula, false);
-        } else {
-            // --- 🔊 効果音の再生（不正解） ---
-            seWrong.currentTime = 0;
-            seWrong.play();
-            updateTurn(data.currentTurn); 
-            alert("違います..."); 
-            addLog(`回答: ${name}`, "不正解... 💨", "no"); 
+        const btn = document.getElementById('btn-guess');
+        const originalText = btn.innerText;
+        btn.innerText = '⏳ 判定中...';
+        btn.disabled = true;
+
+        // ★ ここも try { が必要です
+        try {
+            const response = await fetch('/api/guess', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name }) });
+            const data = await response.json();
+            
+            if (data.correct) {
+                if (data.finalTurn <= 5) {
+                    seCorrectS.currentTime = 0;
+                    seCorrectS.play();
+                } else {
+                    seCorrect.currentTime = 0;
+                    seCorrect.play();
+                }
+                showResult(name, data.finalTurn, data.image, data.formula, false);
+            } else {
+                seWrong.currentTime = 0;
+                seWrong.play();
+                updateTurn(data.currentTurn); 
+                alert("違います..."); 
+                addLog(`回答: ${name}`, "不正解... 💨", "no"); 
+            }
+        } finally { // ★ 上の try {} に対応する finally です
+            btn.innerText = originalText;
+            btn.disabled = false;
         }
     }
 
+    // --- 3. 降参する関数 ---
     async function giveUp() {
         if(!confirm("本当に降参しますか？")) return;
         
-        // --- 🔊 効果音の再生（降参） ---
-        seGiveup.currentTime = 0;
-        seGiveup.play();
+        const btn = document.getElementById('btn-giveup');
+        const originalText = btn.innerText;
+        btn.innerText = '⏳ 処理中...';
+        btn.disabled = true;
 
-        const response = await fetch('/api/giveup', { method: 'POST' });
-        const data = await response.json();
-        showResult(data.name, data.turnCount, data.image, data.formula, true);
+        // ★ ここも try { が必要です
+        try {
+            seGiveup.currentTime = 0;
+            seGiveup.play();
+
+            const response = await fetch('/api/giveup', { method: 'POST' });
+            const data = await response.json();
+            showResult(data.name, data.turnCount, data.image, data.formula, true);
+        } finally { // ★ 上の try {} に対応する finally です
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
     }
 
     function showResult(name, turns, imageFile, formula, isGiveUp) {
