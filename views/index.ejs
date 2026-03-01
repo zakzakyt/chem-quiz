@@ -157,7 +157,7 @@
         <h1>🧞‍♂️ 有機化学アキネイター</h1>
         <p>全68種類の有機化合物から<br>正解を特定してください</p>
         <button class="btn-start" onclick="startGame()">🚀 ゲームスタート</button>
-        <button class="btn-zukan" onclick="openZukan()">📖 コンプリート図鑑 (<span id="start-zukan-count">0</span>/68)</button>
+        <button class="btn-zukan" onclick="openZukan('start-content')">📖 コンプリート図鑑 (<span id="start-zukan-count">0</span>/68)</button>
     </div> 
 
     <div id="zukan-content" class="modal-box" style="display:none; max-width: 800px; width: 95%;">
@@ -187,6 +187,8 @@
         </button>
         
         <button class="btn-start" style="margin:0;" onclick="startGame()">🔄 もう一度遊ぶ</button>
+
+        <button class="btn-zukan" onclick="openZukan('result-content')" style="width: 100%; margin-top: 10px; padding: 12px; font-weight: bold; color: white; border: none; border-radius: 6px; cursor: pointer;">📖 コンプリート図鑑 (<span id="result-zukan-count">0</span>/68)</button>
     </div>
 </div>
 
@@ -421,6 +423,7 @@
             
             if (data.correct) {
                 saveToZukan(data.id, data.finalTurn); // ★これを追加！（正解を記録）
+                updateZukanCount(); // ★ この1行を追加！（保存直後に数字を更新）
 
                 if (data.finalTurn <= 5) {
                     seCorrectS.currentTime = 0;
@@ -513,6 +516,10 @@
     function getOpText(op) { return op === 'equal' ? 'と同じ' : op === 'gte' ? '以上' : '以下'; }
 
     // --- 📖 コンプリート図鑑のロジック ---
+
+    // ★ どこから図鑑を開いたか記憶する変数を追加
+    let previousScreenForZukan = 'start-content';
+
     function saveToZukan(id, turns) {
         // localStorage から過去のデータを取得（なければ空のオブジェクト）
         let zukan = JSON.parse(localStorage.getItem('chemZukan')) || {};
@@ -524,21 +531,26 @@
         }
     }
 
+    // ★ 2つのボタンの数字を両方とも更新するように変更
     function updateZukanCount() {
         let zukan = JSON.parse(localStorage.getItem('chemZukan')) || {};
         const count = Object.keys(zukan).length;
-        document.getElementById('start-zukan-count').innerText = count;
+        const startEl = document.getElementById('start-zukan-count');
+        const resultEl = document.getElementById('result-zukan-count');
+        if (startEl) startEl.innerText = count;
+        if (resultEl) resultEl.innerText = count;
     }
 
-    async function openZukan() {
+    // ★ 引数(fromScreen)を受け取って、元の画面を非表示にするように変更
+    async function openZukan(fromScreen = 'start-content') {
+        previousScreenForZukan = fromScreen; // 開いた画面を記憶
+        
         document.getElementById('start-content').style.display = 'none';
+        document.getElementById('result-content').style.display = 'none'; // 結果画面も非表示にする
         document.getElementById('zukan-content').style.display = 'block';
 
-        // サーバーから図鑑用の全データを取得
         const response = await fetch('/api/compounds/zukan');
         const allCompounds = await response.json();
-        
-        // ローカルのクリア記録を取得
         let zukan = JSON.parse(localStorage.getItem('chemZukan')) || {};
         
         document.getElementById('zukan-progress').innerText = Object.keys(zukan).length;
@@ -557,7 +569,6 @@
                 rankHtml = `<div class="best-rank">Best: ${bestTurns}手 (Rank ${rank})</div>`;
             }
 
-            // 未解禁のものは名前を ??? にする
             const displayName = isUnlocked ? c.name : "???";
             const displayFormula = isUnlocked ? c.formula.replace(/(\d+)/g, "<sub>$1</sub>") : "???";
             
@@ -571,10 +582,11 @@
         });
     }
 
+    // ★ 記憶しておいた元の画面に戻すように変更
     function closeZukan() {
         document.getElementById('zukan-content').style.display = 'none';
-        document.getElementById('start-content').style.display = 'block';
-        updateZukanCount(); // 閉じた時にスタート画面のカウントを更新
+        document.getElementById(previousScreenForZukan).style.display = 'block'; 
+        updateZukanCount(); 
     }
 </script>
 </body>
