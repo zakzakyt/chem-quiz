@@ -295,6 +295,13 @@
 
     let compoundNames = [];
 
+    // ★ ブラウザ側でゲームの進行状況（状態）を記憶するための変数
+    let gameState = {
+        targetId: null,
+        turnCount: 0,
+        history: []
+    };
+
     window.onload = async () => {
         updateFormUI();
         const res = await fetch('/api/compounds/names');
@@ -347,10 +354,15 @@
     }
 
     async function startGame() {
-        await fetch('/api/reset', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
+        const response = await fetch('/api/reset', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
+        const data = await response.json();
+        
+        // サーバーから送られてきた正解IDを使って、ブラウザの記憶をリセット
+        gameState = { targetId: data.targetId, turnCount: 0, history: [] };
+        
         document.getElementById('logs').innerHTML = '';
         document.getElementById('guessName').value = '';
-        document.getElementById('candidate-count').innerText = 68;
+        document.getElementById('candidate-count').innerText = data.totalCandidates;
         updateTurn(0);
         document.getElementById('overlay-screen').style.display = 'none';
         document.getElementById('result-content').style.display = 'none';
@@ -372,16 +384,26 @@
         let value = isBoolean ? 1 : document.getElementById('value').value;
         let operator = isBoolean ? 'equal' : document.getElementById('operator').value;
 
-        // ★ ここに「try {」が必要です！
         try {
+            gameState.turnCount++; // ターンを進める
+
+            // 質問内容と一緒に、記憶している「ID」と「履歴」もサーバーに送る
             const response = await fetch('/api/ask', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ target, value, operator })
+                body: JSON.stringify({ 
+                    targetId: gameState.targetId, 
+                    history: gameState.history, 
+                    target, value, operator 
+                })
             });
 
             const data = await response.json();
-            updateTurn(data.currentTurn);
+            
+            // サーバーから返ってきた「新しい履歴」をブラウザに記憶させる
+            gameState.history.push(data.newHistoryItem);
+            
+            updateTurn(gameState.turnCount);
             
             const countEl = document.getElementById('candidate-count');
             countEl.innerText = data.remainingCount;
@@ -391,17 +413,15 @@
             const isYes = data.answer === "はい";
             
             if (isYes) {
-                seYes.currentTime = 0; 
-                seYes.play();
+                seYes.currentTime = 0; seYes.play();
             } else {
-                seNo.currentTime = 0;
-                seNo.play();
+                seNo.currentTime = 0; seNo.play();
             }
 
             const qText = isBoolean ? `Q. ${selectedOption.text} を示しますか？` : `Q. ${selectedOption.text} は ${value} ${getOpText(operator)} ですか？`;
             addLog(qText, `A. ${data.answer} ${isYes ? '⭕' : '❌'} (残り${data.remainingCount}件)`, isYes ? "yes" : "no");
             
-        } finally { // ★ 上の try {} に対応する finally です
+        } finally { 
             btn.innerText = originalText;
             btn.disabled = false;
         }
@@ -418,36 +438,49 @@
         btn.disabled = true;
 
         try {
-            const response = await fetch('/api/guess', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name }) });
+            gameState.turnCount++;
+
+            // 回答と一緒に、記憶している「ID」と「履歴」をサーバーに送る
+            const response = await fetch('/api/guess', { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ 
+                    targetId: gameState.targetId, 
+                    history: gameState.history, 
+                    name 
+                }) 
+            });
             const data = await response.json();
             
             if (data.correct) {
-                saveToZukan(data.id, data.finalTurn); // ★これを追加！（正解を記録）
-                updateZukanCount(); // ★ この1行を追加！（保存直後に数字を更新）
+                saveToZukan(data.id, gameState.turnCount);
+                updateZukanCount(); 
 
-                if (data.finalTurn <= 5) {
-                    seCorrectS.currentTime = 0;
-                    seCorrectS.play();
+                if (gameState.turnCount <= 5) {
+                    seCorrectS.currentTime = 0; seCorrectS.play();
                 } else {
-                    seCorrect.currentTime = 0;
-                    seCorrect.play();
+                    seCorrect.currentTime = 0; seCorrect.play();
                 }
-                showResult(name, data.finalTurn, data.image, data.formula, false);
+                showResult(name, gameState.turnCount, data.image, data.formula, false);
             } else {
-                seWrong.currentTime = 0;
-                seWrong.play();
-                updateTurn(data.currentTurn); 
+                seWrong.currentTime = 0; seWrong.play();
+                
+                // 不正解の履歴（除外条件）をブラウザの記憶に追加
+                if (data.newHistoryItem) {
+                    gameState.history.push(data.newHistoryItem);
+                }
 
-                // ★ カウンターの数字を更新し、アニメーションさせる
+                updateTurn(gameState.turnCount); 
+                
                 const countEl = document.getElementById('candidate-count');
                 countEl.innerText = data.remainingCount;
                 countEl.parentElement.style.transform = "scale(1.2)";
                 setTimeout(() => countEl.parentElement.style.transform = "scale(1)", 200);
 
                 alert("違います..."); 
-                addLog(`回答: ${name}`, `不正解... 💨 (残り${data.remainingCount}件)`, "no");
+                addLog(`回答: ${name}`, `不正解... 💨 (残り${data.remainingCount}件)`, "no"); 
             }
-        } finally {
+        } finally { 
             btn.innerText = originalText;
             btn.disabled = false;
         }
@@ -462,15 +495,19 @@
         btn.innerText = '⏳ 処理中...';
         btn.disabled = true;
 
-        // ★ ここも try { が必要です
         try {
-            seGiveup.currentTime = 0;
-            seGiveup.play();
+            seGiveup.currentTime = 0; seGiveup.play();
 
-            const response = await fetch('/api/giveup', { method: 'POST' });
+            // 降参時も「自分のIDはこれです」とサーバーに教える
+            const response = await fetch('/api/giveup', { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ targetId: gameState.targetId }) 
+            });
             const data = await response.json();
-            showResult(data.name, data.turnCount, data.image, data.formula, true);
-        } finally { // ★ 上の try {} に対応する finally です
+            
+            showResult(data.name, gameState.turnCount, data.image, data.formula, true);
+        } finally { 
             btn.innerText = originalText;
             btn.disabled = false;
         }
