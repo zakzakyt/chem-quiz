@@ -112,6 +112,7 @@ app.post('/api/guess', (req, res) => {
     res.json({
         correct: correct,
         currentTurn: currentSession.turnCount,
+        id: targetCompound.id, // ★この1行を追加！
         image: correct ? targetCompound.image : null,
         finalTurn: currentSession.turnCount,
         formula: correct ? targetCompound.formula : null,
@@ -134,6 +135,12 @@ app.post('/api/giveup', (req, res) => {
 app.get('/api/compounds/names', (req, res) => {
     const names = compounds.map(c => c.name);
     res.json(names);
+});
+
+// 図鑑描画用の全データ取得API（カンニング防止のため答えのフラグは送らない）
+app.get('/api/compounds/zukan', (req, res) => {
+    const zukanData = compounds.map(c => ({ id: c.id, name: c.name, formula: c.formula, image: c.image }));
+    res.json(zukanData);
 });
 
 const PORT = process.env.PORT || 3000;

@@ -130,6 +130,24 @@
             0% { opacity: 0; transform: translateY(-15px); }
             100% { opacity: 1; transform: translateY(0); }
         }
+
+        /* --- 図鑑機能のスタイル --- */
+        .btn-zukan { background-color: #8e44ad; margin-top: 15px; }
+        .zukan-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px; margin-top: 15px; max-height: 60vh; overflow-y: auto; padding-right: 5px;
+        }
+        .zukan-item {
+            border: 2px solid #ddd; border-radius: 8px; padding: 10px; text-align: center; background: #fff;
+            transition: transform 0.2s;
+        }
+        .zukan-item.locked { background: #eee; color: #999; border-color: #eee; }
+        .zukan-item.locked img { filter: brightness(0) invert(0.8); /* シルエット風にする */ }
+        .zukan-item img { width: 100%; height: 70px; object-fit: contain; margin-bottom: 5px; }
+        .zukan-item .name { font-size: 0.85rem; font-weight: bold; margin-bottom: 3px; }
+        .zukan-item .formula { font-size: 0.75rem; color: #555; }
+        .zukan-item .best-rank { font-size: 0.8rem; font-weight: bold; margin-top: 5px; color: var(--warning-color); }
+
     </style>
 </head>
 <body>
@@ -139,6 +157,16 @@
         <h1>🧞‍♂️ 有機化学アキネイター</h1>
         <p>全68種類の有機化合物から<br>正解を特定してください</p>
         <button class="btn-start" onclick="startGame()">🚀 ゲームスタート</button>
+        <button class="btn-zukan" onclick="openZukan()">📖 コンプリート図鑑 (<span id="start-zukan-count">0</span>/68)</button>
+    </div> 
+
+    <div id="zukan-content" class="modal-box" style="display:none; max-width: 800px; width: 95%;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h2 style="margin:0;">📖 有機化学図鑑</h2>
+            <button onclick="closeZukan()" style="width: auto; background: #e74c3c; padding: 8px 15px;">✖ 閉じる</button>
+        </div>
+        <p style="text-align: left; margin: 0; font-weight: bold;">収集率: <span id="zukan-progress">0</span> / 68 種類</p>
+        <div id="zukan-grid" class="zukan-grid"></div>
     </div>
 
     <div id="result-content" class="modal-box" style="display:none;">
@@ -270,6 +298,7 @@
         const res = await fetch('/api/compounds/names');
         compoundNames = await res.json();
         setupAutocomplete();
+        updateZukanCount(); // ★これを追加
     };
 
     function hiraToKata(str) {
@@ -391,6 +420,8 @@
             const data = await response.json();
             
             if (data.correct) {
+                saveToZukan(data.id, data.finalTurn); // ★これを追加！（正解を記録）
+
                 if (data.finalTurn <= 5) {
                     seCorrectS.currentTime = 0;
                     seCorrectS.play();
@@ -480,6 +511,71 @@
         document.getElementById('logs').prepend(div);
     }
     function getOpText(op) { return op === 'equal' ? 'と同じ' : op === 'gte' ? '以上' : '以下'; }
+
+    // --- 📖 コンプリート図鑑のロジック ---
+    function saveToZukan(id, turns) {
+        // localStorage から過去のデータを取得（なければ空のオブジェクト）
+        let zukan = JSON.parse(localStorage.getItem('chemZukan')) || {};
+        
+        // 初めての正解、または過去の記録より少ないターン数でクリアした場合に更新
+        if (!zukan[id] || turns < zukan[id]) {
+            zukan[id] = turns;
+            localStorage.setItem('chemZukan', JSON.stringify(zukan));
+        }
+    }
+
+    function updateZukanCount() {
+        let zukan = JSON.parse(localStorage.getItem('chemZukan')) || {};
+        const count = Object.keys(zukan).length;
+        document.getElementById('start-zukan-count').innerText = count;
+    }
+
+    async function openZukan() {
+        document.getElementById('start-content').style.display = 'none';
+        document.getElementById('zukan-content').style.display = 'block';
+
+        // サーバーから図鑑用の全データを取得
+        const response = await fetch('/api/compounds/zukan');
+        const allCompounds = await response.json();
+        
+        // ローカルのクリア記録を取得
+        let zukan = JSON.parse(localStorage.getItem('chemZukan')) || {};
+        
+        document.getElementById('zukan-progress').innerText = Object.keys(zukan).length;
+        const grid = document.getElementById('zukan-grid');
+        grid.innerHTML = '';
+
+        allCompounds.forEach(c => {
+            const div = document.createElement('div');
+            const isUnlocked = zukan.hasOwnProperty(c.id);
+            div.className = `zukan-item ${isUnlocked ? '' : 'locked'}`;
+
+            const bestTurns = zukan[c.id];
+            let rankHtml = "";
+            if (isUnlocked) {
+                let rank = bestTurns <= 5 ? "S" : bestTurns <= 8 ? "A" : bestTurns <= 12 ? "B" : "C";
+                rankHtml = `<div class="best-rank">Best: ${bestTurns}手 (Rank ${rank})</div>`;
+            }
+
+            // 未解禁のものは名前を ??? にする
+            const displayName = isUnlocked ? c.name : "???";
+            const displayFormula = isUnlocked ? c.formula.replace(/(\d+)/g, "<sub>$1</sub>") : "???";
+            
+            div.innerHTML = `
+                <img src="/images/${c.image}" alt="${displayName}">
+                <div class="name">${displayName}</div>
+                <div class="formula">${displayFormula}</div>
+                ${rankHtml}
+            `;
+            grid.appendChild(div);
+        });
+    }
+
+    function closeZukan() {
+        document.getElementById('zukan-content').style.display = 'none';
+        document.getElementById('start-content').style.display = 'block';
+        updateZukanCount(); // 閉じた時にスタート画面のカウントを更新
+    }
 </script>
 </body>
 </html>
