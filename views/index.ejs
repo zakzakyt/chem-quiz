@@ -295,9 +295,9 @@
 
     let compoundNames = [];
 
-    // ★ ブラウザ側でゲームの進行状況（状態）を記憶するための変数
+    // ★ targetId の代わりに token を記憶する
     let gameState = {
-        targetId: null,
+        token: null, 
         turnCount: 0,
         history: []
     };
@@ -357,8 +357,8 @@
         const response = await fetch('/api/reset', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
         const data = await response.json();
         
-        // サーバーから送られてきた正解IDを使って、ブラウザの記憶をリセット
-        gameState = { targetId: data.targetId, turnCount: 0, history: [] };
+        // ★ サーバーから送られてきた暗号化チケット（token）を記憶
+        gameState = { token: data.token, turnCount: 0, history: [] };
         
         document.getElementById('logs').innerHTML = '';
         document.getElementById('guessName').value = '';
@@ -380,29 +380,19 @@
         const selectedOption = targetSelect.options[targetSelect.selectedIndex];
         const target = targetSelect.value;
         const isBoolean = !document.getElementById('boolean-text-area').classList.contains('hidden');
-        
         let value = isBoolean ? 1 : document.getElementById('value').value;
         let operator = isBoolean ? 'equal' : document.getElementById('operator').value;
 
         try {
-            gameState.turnCount++; // ターンを進める
-
-            // 質問内容と一緒に、記憶している「ID」と「履歴」もサーバーに送る
+            gameState.turnCount++;
+            // ★ tokenを送信
             const response = await fetch('/api/ask', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    targetId: gameState.targetId, 
-                    history: gameState.history, 
-                    target, value, operator 
-                })
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: gameState.token, history: gameState.history, target, value, operator })
             });
 
             const data = await response.json();
-            
-            // サーバーから返ってきた「新しい履歴」をブラウザに記憶させる
             gameState.history.push(data.newHistoryItem);
-            
             updateTurn(gameState.turnCount);
             
             const countEl = document.getElementById('candidate-count');
@@ -411,19 +401,12 @@
             setTimeout(() => countEl.parentElement.style.transform = "scale(1)", 200);
 
             const isYes = data.answer === "はい";
-            
-            if (isYes) {
-                seYes.currentTime = 0; seYes.play();
-            } else {
-                seNo.currentTime = 0; seNo.play();
-            }
+            if (isYes) { seYes.currentTime = 0; seYes.play(); } else { seNo.currentTime = 0; seNo.play(); }
 
             const qText = isBoolean ? `Q. ${selectedOption.text} を示しますか？` : `Q. ${selectedOption.text} は ${value} ${getOpText(operator)} ですか？`;
             addLog(qText, `A. ${data.answer} ${isYes ? '⭕' : '❌'} (残り${data.remainingCount}件)`, isYes ? "yes" : "no");
-            
         } finally { 
-            btn.innerText = originalText;
-            btn.disabled = false;
+            btn.innerText = originalText; btn.disabled = false;
         }
     }
 
@@ -439,37 +422,21 @@
 
         try {
             gameState.turnCount++;
-
-            // 回答と一緒に、記憶している「ID」と「履歴」をサーバーに送る
+            // ★ tokenを送信
             const response = await fetch('/api/guess', { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ 
-                    targetId: gameState.targetId, 
-                    history: gameState.history, 
-                    name 
-                }) 
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ token: gameState.token, history: gameState.history, name }) 
             });
             const data = await response.json();
             
             if (data.correct) {
                 saveToZukan(data.id, gameState.turnCount);
                 updateZukanCount(); 
-
-                if (gameState.turnCount <= 5) {
-                    seCorrectS.currentTime = 0; seCorrectS.play();
-                } else {
-                    seCorrect.currentTime = 0; seCorrect.play();
-                }
+                if (gameState.turnCount <= 5) { seCorrectS.currentTime = 0; seCorrectS.play(); } else { seCorrect.currentTime = 0; seCorrect.play(); }
                 showResult(name, gameState.turnCount, data.image, data.formula, false);
             } else {
                 seWrong.currentTime = 0; seWrong.play();
-                
-                // 不正解の履歴（除外条件）をブラウザの記憶に追加
-                if (data.newHistoryItem) {
-                    gameState.history.push(data.newHistoryItem);
-                }
-
+                if (data.newHistoryItem) gameState.history.push(data.newHistoryItem);
                 updateTurn(gameState.turnCount); 
                 
                 const countEl = document.getElementById('candidate-count');
@@ -481,15 +448,13 @@
                 addLog(`回答: ${name}`, `不正解... 💨 (残り${data.remainingCount}件)`, "no"); 
             }
         } finally { 
-            btn.innerText = originalText;
-            btn.disabled = false;
+            btn.innerText = originalText; btn.disabled = false;
         }
     }
 
     // --- 3. 降参する関数 ---
     async function giveUp() {
         if(!confirm("本当に降参しますか？")) return;
-        
         const btn = document.getElementById('btn-giveup');
         const originalText = btn.innerText;
         btn.innerText = '⏳ 処理中...';
@@ -497,19 +462,15 @@
 
         try {
             seGiveup.currentTime = 0; seGiveup.play();
-
-            // 降参時も「自分のIDはこれです」とサーバーに教える
+            // ★ tokenを送信
             const response = await fetch('/api/giveup', { 
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ targetId: gameState.targetId }) 
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: gameState.token }) 
             });
             const data = await response.json();
-            
             showResult(data.name, gameState.turnCount, data.image, data.formula, true);
         } finally { 
-            btn.innerText = originalText;
-            btn.disabled = false;
+            btn.innerText = originalText; btn.disabled = false;
         }
     }
 
