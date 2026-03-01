@@ -104,5 +104,12 @@ app.post('/api/giveup', (req, res) => {
     });
 });
 
+// --- app.js に追加 ---
+// オートコンプリート用の名前リストを取得するAPI
+app.get('/api/compounds/names', (req, res) => {
+    const names = compounds.map(c => c.name);
+    res.json(names);
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

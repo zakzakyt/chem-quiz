@@ -96,6 +96,16 @@
             background-color: #000; color: #fff; display: flex; align-items: center;
             justify-content: center; gap: 8px; margin: 15px 0;
         }
+
+        /* --- ここから予測変換リストのスタイル --- */
+        .autocomplete-wrapper { position: relative; width: 100%; }
+        .autocomplete-items {
+            position: absolute; border: 1px solid #ddd; border-top: none; z-index: 99;
+            top: 100%; left: 0; right: 0; max-height: 200px; overflow-y: auto;
+            background-color: #fff; border-radius: 0 0 6px 6px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .autocomplete-items div { padding: 12px; cursor: pointer; border-bottom: 1px solid #eee; }
+        .autocomplete-items div:hover { background-color: #f0f0f0; color: var(--primary-color); font-weight: bold;}
     </style>
 </head>
 <body>
@@ -200,7 +210,10 @@
     <div class="card">
         <h3>💡 名前を答える</h3>
         <div class="control-group">
-            <input type="text" id="guessName" placeholder="化合物名を入力 (例: ベンゼン)" style="width: 100%;">
+            <div class="autocomplete-wrapper">
+                <input type="text" id="guessName" placeholder="化合物名を入力 (例: ベンゼン)" style="width: 100%; box-sizing: border-box;" autocomplete="off">
+                <div id="autocomplete-list" class="autocomplete-items"></div>
+            </div>
         </div>
         <button class="btn-guess" onclick="guessAnswer()">回答する</button>
         <button class="btn-giveup" onclick="giveUp()">降参して答えを見る...</button>
@@ -317,7 +330,56 @@
         document.getElementById('logs').prepend(div);
     }
     function getOpText(op) { return op === 'equal' ? 'と同じ' : op === 'gte' ? '以上' : '以下'; }
-    window.onload = updateFormUI;
+
+    let compoundNames = []; // 全化合物の名前リストを保持する変数
+
+    // ★ window.onload を書き換え
+    window.onload = async () => {
+        updateFormUI();
+        // ページ読み込み時に名前リストを取得して予測変換をセットアップ
+        const res = await fetch('/api/compounds/names');
+        compoundNames = await res.json();
+        setupAutocomplete();
+    };
+
+    // ★ ひらがなをカタカナに変換する関数（「ぷ」→「プ」対応のため）
+    function hiraToKata(str) {
+        return str.replace(/[\u3041-\u3096]/g, match => String.fromCharCode(match.charCodeAt(0) + 0x60));
+    }
+
+    // ★ 予測変換のメインロジック
+    function setupAutocomplete() {
+        const inp = document.getElementById("guessName");
+        const listContainer = document.getElementById("autocomplete-list");
+
+        inp.addEventListener("input", function() {
+            const val = this.value;
+            listContainer.innerHTML = ""; // 入力するたびにリストをリセット
+            if (!val) return;
+
+            const normalizedVal = hiraToKata(val); // 入力されたひらがなをカタカナに変換
+
+            compoundNames.forEach(name => {
+                // 入力文字が名前に含まれているか判定（部分一致）
+                if (name.includes(normalizedVal) || name.includes(val)) {
+                    const div = document.createElement("div");
+                    div.innerText = name;
+                    
+                    // 候補をクリックした時の処理
+                    div.addEventListener("click", function() {
+                        inp.value = name; // テキストボックスに名前をセット
+                        listContainer.innerHTML = ""; // リストを閉じる
+                    });
+                    listContainer.appendChild(div);
+                }
+            });
+        });
+
+        // テキストボックスやリスト以外の場所をクリックしたらリストを閉じる
+        document.addEventListener("click", function (e) {
+            if (e.target !== inp) listContainer.innerHTML = "";
+        });
+    }
 </script>
 </body>
 </html>
