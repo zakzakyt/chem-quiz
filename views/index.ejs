@@ -223,6 +223,64 @@
 </div>
 
 <script>
+    // --- 🔊 効果音の準備 ---
+    const seYes = new Audio('/sounds/yes.mp3');
+    const seNo = new Audio('/sounds/no.mp3');
+    const seCorrect = new Audio('/sounds/correct.mp3');
+    const seCorrectS = new Audio('/sounds/correct_s.mp3'); // ★ここを追加！(Sランク用)
+    const seWrong = new Audio('/sounds/wrong.mp3');
+    const seGiveup = new Audio('/sounds/giveup.mp3');
+
+    // 音量を少し下げておく（0.0 〜 1.0）
+    seYes.volume = 0.5;
+    seNo.volume = 0.5;
+    seCorrect.volume = 0.5;
+    seCorrectS.volume = 0.5; // ★ここを追加！
+    seWrong.volume = 0.5;
+    seGiveup.volume = 0.5;
+
+    let compoundNames = [];
+
+    window.onload = async () => {
+        updateFormUI();
+        const res = await fetch('/api/compounds/names');
+        compoundNames = await res.json();
+        setupAutocomplete();
+    };
+
+    function hiraToKata(str) {
+        return str.replace(/[\u3041-\u3096]/g, match => String.fromCharCode(match.charCodeAt(0) + 0x60));
+    }
+
+    function setupAutocomplete() {
+        const inp = document.getElementById("guessName");
+        const listContainer = document.getElementById("autocomplete-list");
+
+        inp.addEventListener("input", function() {
+            const val = this.value;
+            listContainer.innerHTML = ""; 
+            if (!val) return;
+
+            const normalizedVal = hiraToKata(val); 
+
+            compoundNames.forEach(name => {
+                if (name.includes(normalizedVal) || name.includes(val)) {
+                    const div = document.createElement("div");
+                    div.innerText = name;
+                    div.addEventListener("click", function() {
+                        inp.value = name; 
+                        listContainer.innerHTML = ""; 
+                    });
+                    listContainer.appendChild(div);
+                }
+            });
+        });
+
+        document.addEventListener("click", function (e) {
+            if (e.target !== inp) listContainer.innerHTML = "";
+        });
+    }
+
     function updateFormUI() {
         const targetSelect = document.getElementById('target');
         const selectedOption = targetSelect.options[targetSelect.selectedIndex];
@@ -237,7 +295,7 @@
         await fetch('/api/reset', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
         document.getElementById('logs').innerHTML = '';
         document.getElementById('guessName').value = '';
-        document.getElementById('candidate-count').innerText = 68; // ★ここを追加
+        document.getElementById('candidate-count').innerText = 68;
         updateTurn(0);
         document.getElementById('overlay-screen').style.display = 'none';
         document.getElementById('result-content').style.display = 'none';
@@ -259,19 +317,25 @@
             body: JSON.stringify({ target, value, operator })
         });
 
-        const data = await response.json();        
+        const data = await response.json();
         updateTurn(data.currentTurn);
-
-        // ★ここを追加: 残り候補数を更新
+        
         const countEl = document.getElementById('candidate-count');
         countEl.innerText = data.remainingCount;
-
-        // アニメーション効果（数字が変わったことを強調）
         countEl.parentElement.style.transform = "scale(1.2)";
         setTimeout(() => countEl.parentElement.style.transform = "scale(1)", 200);
 
         const isYes = data.answer === "はい";
         
+        // --- 🔊 効果音の再生（質問判定） ---
+        if (isYes) {
+            seYes.currentTime = 0; // 連続で鳴らせるように再生位置をリセット
+            seYes.play();
+        } else {
+            seNo.currentTime = 0;
+            seNo.play();
+        }
+
         const qText = isBoolean ? `Q. ${selectedOption.text} を示しますか？` : `Q. ${selectedOption.text} は ${value} ${getOpText(operator)} ですか？`;
         addLog(qText, `A. ${data.answer} ${isYes ? '⭕' : '❌'} (残り${data.remainingCount}件)`, isYes ? "yes" : "no");
     }
@@ -281,12 +345,36 @@
         if(!name) return;
         const response = await fetch('/api/guess', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name }) });
         const data = await response.json();
-        if (data.correct) showResult(name, data.finalTurn, data.image, data.formula, false);
-        else { updateTurn(data.currentTurn); alert("違います..."); addLog(`回答: ${name}`, "不正解... 💨", "no"); }
+        
+        if (data.correct) {
+            // --- 🔊 効果音の再生（正解） ---
+            // ★ターン数が5以下（Sランク）なら特別な音を鳴らす
+            if (data.finalTurn <= 5) {
+                seCorrectS.currentTime = 0;
+                seCorrectS.play();
+            } else {
+                seCorrect.currentTime = 0;
+                seCorrect.play();
+            }
+            
+            showResult(name, data.finalTurn, data.image, data.formula, false);
+        } else {
+            // --- 🔊 効果音の再生（不正解） ---
+            seWrong.currentTime = 0;
+            seWrong.play();
+            updateTurn(data.currentTurn); 
+            alert("違います..."); 
+            addLog(`回答: ${name}`, "不正解... 💨", "no"); 
+        }
     }
 
     async function giveUp() {
         if(!confirm("本当に降参しますか？")) return;
+        
+        // --- 🔊 効果音の再生（降参） ---
+        seGiveup.currentTime = 0;
+        seGiveup.play();
+
         const response = await fetch('/api/giveup', { method: 'POST' });
         const data = await response.json();
         showResult(data.name, data.turnCount, data.image, data.formula, true);
@@ -313,7 +401,7 @@
             rankEl.innerText = rank;
             shareBtn.style.display = 'flex';
             shareBtn.onclick = () => {
-                const text = `【有機化学構造決定クイズ】\n正解の「${name}」を ${turns} ターンで特定しました！\nランク: ${rank}\n#有機化学クイズ #九工大`;
+                const text = `【有機化学アキネイター】\n正解の「${name}」を ${turns} ターンで特定しました！\nランク: ${rank}\n#有機化学クイズ #九工大`;
                 window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(window.location.href)}`, '_blank');
             };
         }
@@ -330,56 +418,6 @@
         document.getElementById('logs').prepend(div);
     }
     function getOpText(op) { return op === 'equal' ? 'と同じ' : op === 'gte' ? '以上' : '以下'; }
-
-    let compoundNames = []; // 全化合物の名前リストを保持する変数
-
-    // ★ window.onload を書き換え
-    window.onload = async () => {
-        updateFormUI();
-        // ページ読み込み時に名前リストを取得して予測変換をセットアップ
-        const res = await fetch('/api/compounds/names');
-        compoundNames = await res.json();
-        setupAutocomplete();
-    };
-
-    // ★ ひらがなをカタカナに変換する関数（「ぷ」→「プ」対応のため）
-    function hiraToKata(str) {
-        return str.replace(/[\u3041-\u3096]/g, match => String.fromCharCode(match.charCodeAt(0) + 0x60));
-    }
-
-    // ★ 予測変換のメインロジック
-    function setupAutocomplete() {
-        const inp = document.getElementById("guessName");
-        const listContainer = document.getElementById("autocomplete-list");
-
-        inp.addEventListener("input", function() {
-            const val = this.value;
-            listContainer.innerHTML = ""; // 入力するたびにリストをリセット
-            if (!val) return;
-
-            const normalizedVal = hiraToKata(val); // 入力されたひらがなをカタカナに変換
-
-            compoundNames.forEach(name => {
-                // 入力文字が名前に含まれているか判定（部分一致）
-                if (name.includes(normalizedVal) || name.includes(val)) {
-                    const div = document.createElement("div");
-                    div.innerText = name;
-                    
-                    // 候補をクリックした時の処理
-                    div.addEventListener("click", function() {
-                        inp.value = name; // テキストボックスに名前をセット
-                        listContainer.innerHTML = ""; // リストを閉じる
-                    });
-                    listContainer.appendChild(div);
-                }
-            });
-        });
-
-        // テキストボックスやリスト以外の場所をクリックしたらリストを閉じる
-        document.addEventListener("click", function (e) {
-            if (e.target !== inp) listContainer.innerHTML = "";
-        });
-    }
 </script>
 </body>
 </html>
