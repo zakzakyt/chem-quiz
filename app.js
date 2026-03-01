@@ -108,13 +108,14 @@ app.post('/api/guess', (req, res) => {
             return condition.mustMatch ? check : !check;
         });
     });
-    
+
     res.json({
         correct: correct,
         currentTurn: currentSession.turnCount,
         image: correct ? targetCompound.image : null,
         finalTurn: currentSession.turnCount,
-        formula: correct ? targetCompound.formula : null
+        formula: correct ? targetCompound.formula : null,
+        remainingCount: remainingCandidates.length // フロントエンドに残り数を返す
     });
 });
 
