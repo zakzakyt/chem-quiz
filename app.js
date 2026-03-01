@@ -15,6 +15,12 @@ let currentSession = {
 // 判定ロジック関数（全化合物へのフィルタリングで再利用するため独立化）
 function checkCondition(compound, targetProp, value, operator) {
     const compoundValue = compound[targetProp];
+
+    // ★ 名前（文字列）の比較用に追加
+    if (targetProp === 'name') {
+        return compoundValue === value;
+    }
+
     const numValue = parseInt(value, 10);
 
     // ブール値（フラグ）の場合の処理
@@ -85,6 +91,24 @@ app.post('/api/guess', (req, res) => {
     const targetCompound = compounds.find(c => c.id === currentSession.targetId);
     const correct = targetCompound.name === name;
 
+    // ★ 不正解だった場合、その名前を「除外条件」として履歴に追加
+    if (!correct) {
+        currentSession.history.push({
+            targetProp: 'name',
+            value: name,
+            operator: 'equal',
+            mustMatch: false // 「この名前と一致してはいけない」という条件
+        });
+    }
+
+    // ★ 現在の履歴すべてに矛盾しない候補を数え直す
+    const remainingCandidates = compounds.filter(c => {
+        return currentSession.history.every(condition => {
+            const check = checkCondition(c, condition.targetProp, condition.value, condition.operator);
+            return condition.mustMatch ? check : !check;
+        });
+    });
+    
     res.json({
         correct: correct,
         currentTurn: currentSession.turnCount,

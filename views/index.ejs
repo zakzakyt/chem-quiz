@@ -386,7 +386,6 @@
         btn.innerText = '⏳ 判定中...';
         btn.disabled = true;
 
-        // ★ ここも try { が必要です
         try {
             const response = await fetch('/api/guess', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name }) });
             const data = await response.json();
@@ -404,10 +403,17 @@
                 seWrong.currentTime = 0;
                 seWrong.play();
                 updateTurn(data.currentTurn); 
+
+                // ★ カウンターの数字を更新し、アニメーションさせる
+                const countEl = document.getElementById('candidate-count');
+                countEl.innerText = data.remainingCount;
+                countEl.parentElement.style.transform = "scale(1.2)";
+                setTimeout(() => countEl.parentElement.style.transform = "scale(1)", 200);
+
                 alert("違います..."); 
-                addLog(`回答: ${name}`, "不正解... 💨", "no"); 
+                addLog(`回答: ${name}`, `不正解... 💨 (残り${data.remainingCount}件)`, "no");
             }
-        } finally { // ★ 上の try {} に対応する finally です
+        } finally {
             btn.innerText = originalText;
             btn.disabled = false;
         }
