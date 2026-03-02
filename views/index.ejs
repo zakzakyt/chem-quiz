@@ -161,7 +161,7 @@
 
 <div id="overlay-screen">
     <div id="start-content" class="modal-box">
-        <h1>🧞‍♂️ 有機化学アキネイター</h1>
+        <h1>有機化学アキネイター</h1>
         <p>全68種類の有機化合物から<br>正解を特定してください</p>
         <button class="btn-start" onclick="startGame()">🚀 ゲームスタート</button>
         <button class="btn-zukan" onclick="openZukan('start-content')">📖 コンプリート図鑑 (<span id="start-zukan-count">0</span>/68)</button>
@@ -174,6 +174,12 @@
         </div>
         <p style="text-align: left; margin: 0; font-weight: bold;">収集率: <span id="zukan-progress">0</span> / 68 種類</p>
         <div id="zukan-grid" class="zukan-grid"></div>
+    </div>
+
+    <div style="text-align: center; margin-top: 20px;">
+        <a href="ここにコピーしたGoogleフォームのURLを貼り付ける" target="_blank" rel="noopener noreferrer" style="color: #7f8c8d; font-size: 14px; text-decoration: underline;">
+            💡 バグ報告・追加してほしい機能のリクエストはこちら
+        </a>
     </div>
 
     <div id="result-content" class="modal-box" style="display:none;">
@@ -201,7 +207,7 @@
 
 <div class="container">
     <header class="header-info">
-        <h1>🧞‍♂️ 有機化学アキネイター</h1>
+        <h1>有機化学アキネイター</h1>
         <div style="display: flex; gap: 10px; justify-content: center;">
             <div class="turn-badge">現在: <span id="turn-display">0</span> ターン目</div>
             <div class="turn-badge" style="background: #e67e22;">候補: <span id="candidate-count">68</span> / 68</div>
@@ -292,7 +298,7 @@
                 .catch(err => console.log('Service Worker 登録失敗...', err));
         });
     }
-    
+
     // --- 🔊 効果音の準備 ---
     const seYes = new Audio('/sounds/yes.mp3');
     const seNo = new Audio('/sounds/no.mp3');
