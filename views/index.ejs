@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <title>有機化学アキネイター - 68種類の化合物を特定せよ！</title>
+
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#34495e">
+    <link rel="apple-touch-icon" href="/images/icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <meta name="description" content="大学入試・プロレベルの有機化合物を特定する「有機化学アキネイター」。全68種類のデータセットから、いかに少ない質問で構造を決定できるか挑戦しましょう。">
     <meta name="keywords" content="有機化学, 構造決定, 化学, クイズ, 大学入試, 共通テスト, 学習アプリ, 九工大, アキネイター">
     
@@ -277,6 +284,15 @@
 </div>
 
 <script>
+    // --- PWA Service Worker の登録 ---
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log('Service Worker 登録成功!', reg))
+                .catch(err => console.log('Service Worker 登録失敗...', err));
+        });
+    }
+    
     // --- 🔊 効果音の準備 ---
     const seYes = new Audio('/sounds/yes.mp3');
     const seNo = new Audio('/sounds/no.mp3');
