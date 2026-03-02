@@ -165,6 +165,12 @@
         <p>全68種類の有機化合物から<br>正解を特定してください</p>
         <button class="btn-start" onclick="startGame()">🚀 ゲームスタート</button>
         <button class="btn-zukan" onclick="openZukan('start-content')">📖 コンプリート図鑑 (<span id="start-zukan-count">0</span>/68)</button>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSddncVHeWUWBx39gHdKaGSYi3pqMV-HqSzJTLPcwRnu2Sb_6w/viewform?usp=dialog" target="_blank" rel="noopener noreferrer" style="color: #7f8c8d; font-size: 14px; text-decoration: underline;">
+                💡 バグ報告・追加してほしい機能のリクエストはこちら
+            </a>
+        </div>
     </div> 
 
     <div id="zukan-content" class="modal-box" style="display:none; max-width: 800px; width: 95%;">
@@ -174,12 +180,6 @@
         </div>
         <p style="text-align: left; margin: 0; font-weight: bold;">収集率: <span id="zukan-progress">0</span> / 68 種類</p>
         <div id="zukan-grid" class="zukan-grid"></div>
-    </div>
-
-    <div style="text-align: center; margin-top: 20px;">
-        <a href="ここにコピーしたGoogleフォームのURLを貼り付ける" target="_blank" rel="noopener noreferrer" style="color: #7f8c8d; font-size: 14px; text-decoration: underline;">
-            💡 バグ報告・追加してほしい機能のリクエストはこちら
-        </a>
     </div>
 
     <div id="result-content" class="modal-box" style="display:none;">
