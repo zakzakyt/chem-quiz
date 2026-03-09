@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path'); // ★これを追加（現在地を正確に把握するGPSツール）
 const app = express();
 const compounds = require('./data');
 // ★ JWTライブラリの読み込み
@@ -7,8 +8,10 @@ const jwt = require('jsonwebtoken');
 // ★ 暗号化のための「秘密鍵」（絶対にユーザーには教えないサーバーだけのパスワード）
 const SECRET_KEY = process.env.JWT_SECRET || 'super-secret-chem-key-2026';
 
+// ★ __dirname（app.js自身の現在地）を基準にして、正確な場所を教える
+app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 
 function checkCondition(compound, targetProp, value, operator) {
