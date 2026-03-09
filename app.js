@@ -118,5 +118,5 @@ app.post('/api/giveup', (req, res) => {
     res.json({ name: targetCompound.name, image: targetCompound.image, formula: targetCompound.formula });
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Vercel（サーバーレス）環境ではアプリを起動しっぱなしにせず、モジュールとして書き出す
+module.exports = app;
